@@ -1,0 +1,3 @@
+table:
+  name: workspace_user_type
+  schema: public
