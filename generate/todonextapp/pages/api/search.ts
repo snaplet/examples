@@ -25,12 +25,27 @@ export default async function handler(
     }
 
     const results = await db.todo.findMany({
+      select: {
+        id: true,
+        text: true,
+        completed: true,
+        // votes: {
+        //   select: {
+        //     value: true,
+        //   }
+        // }
+      },
       where: whereInput,
       take: limit,
       orderBy: {
         id: 'desc',
       }
-    });
+    })
+    // .then(todos => todos.map(todo => ({
+    //   ...todo,
+    //   upvoteCount: todo.votes.filter(vote => vote.value === 'UPVOTE').length,
+    //   downvoteCount: todo.votes.filter(vote => vote.value === 'DOWNVOTE').length,
+    // })))
     res.status(200).json(results);
   } catch (error) {
     console.error(error);

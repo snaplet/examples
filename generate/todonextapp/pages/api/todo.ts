@@ -17,13 +17,28 @@ export default async function handler(
         const { completed } = req.query;
 
         const results = await db.todo.findMany({
+          select: {
+            id: true,
+            text: true,
+            completed: true,
+            // votes: {
+            //   select: {
+            //     value: true,
+            //   }
+            // }
+          },
           where: {
             completed: completed !== undefined ? completed === 'true' : undefined,
           },
           orderBy: {
             id: 'desc',
           },
-        });
+        })
+        // .then(todos => todos.map(todo => ({
+        //   ...todo,
+        //   upvoteCount: todo.votes.filter(vote => vote.value === 'UPVOTE').length,
+        //   downvoteCount: todo.votes.filter(vote => vote.value === 'DOWNVOTE').length,
+        // })))
         res.status(200).json(results);
       } catch (error) {
         console.error(error);
@@ -32,11 +47,13 @@ export default async function handler(
       break;
     case 'POST':
       try {
+        // const firstUser = await db.user.findFirstOrThrow();
         const { text, completed } = req.body;
         const result = await db.todo.create({
           data: {
             text,
             completed,
+            // created_by_id: firstUser?.id,
           },
         });
         res.status(201).json(result);
