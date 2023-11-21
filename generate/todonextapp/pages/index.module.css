@@ -1,0 +1,17 @@
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.root {
+    min-height: 100vh;
+}
+
+.mainWrapper {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.deleteButton:hover {
+    cursor: pointer;
+}
