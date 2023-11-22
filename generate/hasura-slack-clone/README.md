@@ -40,13 +40,11 @@ Setting up a working local environment is our first step. Here's how to get star
 
 Opening `http://localhost:9695/console` should now display the Hasura console. You'll notice that our database is currently empty, but we're all set to change that!
 
-![hasura-todo-app-database-schema](https://graphql-engine-cdn.hasura.io/learn-hasura/assets/graphql-hasura-auth/slack-datamodel.png)
-
 ![hasura-console-image-gif]()
 
 As you can see for now, there is no data in our database. But we now have a deployed schema who look like this:
 
-![hasura-schema-database-image-gif]()
+![hasura-todo-app-database-schema](https://graphql-engine-cdn.hasura.io/learn-hasura/assets/graphql-hasura-auth/slack-datamodel.png)
 
 Let's setup snaplet to generate some data for us.
 
