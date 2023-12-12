@@ -1,14 +1,14 @@
 # Todo app Next.js
 
-## Declarative Seeding with Snaplet Generate
+## Declarative Seeding with Snaplet seed
 
 ### What's This All About?
 
-In this post, we'll dive into the fundamentals of `snaplet generate`. Our tool aims to redefine seed script writing—making it declarative, minimalistic, and maintainable. We use Typescript, a language beloved by many developers. By the end, you'll not only be equipped to integrate `snaplet generate` into your stack for enhanced dev environments but also appreciate how it streamlines and accelerates seed script creation.
+In this post, we'll dive into the fundamentals of `@snaplet/seed`. Our tool aims to redefine seed script writing—making it declarative, minimalistic, and maintainable. We use Typescript, a language beloved by many developers. By the end, you'll not only be equipped to integrate `@snaplet/seed` into your stack for enhanced dev environments but also appreciate how it streamlines and accelerates seed script creation.
 
 ### Our Approach
 
-We'll use a simple todo app as our example (source code available [here](https://github.com/avallete/todonextjs). Through this, we'll explore a typical development scenario, demonstrating the utility of `snaplet generate`.
+We'll use a simple todo app as our example (source code available [here](https://github.com/avallete/todonextjs). Through this, we'll explore a typical development scenario, demonstrating the utility of `@snaplet/seed`.
 
 ### Prerequisites
 
@@ -20,7 +20,7 @@ Before running this project, you will need the following installed on your syste
 
 ### Getting Started
 
-1. `git clone git@github.com:snaplet/examples.git && cd examples/generate/todonextapp`
+1. `git clone git@github.com:snaplet/examples.git && cd examples/seed/todonextapp`
 2. `npm install`
 3. Edit `DATABASE_URL` in `.env` to make it match your PostgreSQL database.
 4. Deploy the prisma model to our local database with: `npx prisma db push --force-reset`
@@ -47,12 +47,12 @@ With a straightforward interface and typical CRUD endpoints, our app quickly com
 
 https://github.com/avallete/todonextjs/assets/8771783/5896b6a7-7bb1-4bf1-8a85-b125c0177a83
 
-Imagine wanting to create numerous todos to test various functionalities. This is where diverse approaches come into play—some prefer seed classes for each model, others lean towards straightforward SQL or TS scripts. Let's introduce another method: `snaplet generate`.
+Imagine wanting to create numerous todos to test various functionalities. This is where diverse approaches come into play—some prefer seed classes for each model, others lean towards straightforward SQL or TS scripts. Let's introduce another method: `@snaplet/seed`.
 
 Here's how `snaplet` operates:
 
 1. **Introspection:** It analyzes your database, gathering schema, data, and relationship details via `snaplet setup`.
-2. **Configuration:** You receive a `snaplet.config.ts` file, where you can declaratively specify your desired data creation. `snaplet` then utilizes the information from the introspection phase.
+2. **Configuration:** You receive a `seeds.mts` file, where you can declaratively specify your desired data creation. `snaplet` then utilizes the information from the introspection phase.
 
 Setting it up is as simple as:
 
@@ -60,24 +60,20 @@ Setting it up is as simple as:
 npx --yes snaplet@latest setup 
 ```
 
-Select the option 2 "No, I want to generate data locally" and provide your database URL when prompted.
+Select the option 1 "I want to generate seed data" and provide your database URL when prompted.
 
-This process generates a `snaplet.config.ts` file:
+This process generates a `seed.mts` file:
 ```ts
-import { copycat, faker } from "@snaplet/copycat";
-import { defineConfig } from "snaplet";
-copycat.setHashKey("yHiTMIO7lhhnEoPX");
-export default defineConfig({
-  generate: {
-    async run(snaplet) {
-      await snaplet.todo((x) => x(2));
-    },
-  },
+import { SnapletClient } from '@snaplet/seed';
+
+const snaplet = new SnapletClient({
+  dryRun: process.env.DRY === '1'
 });
 
+await snaplet.todo(x => x(3))
 ```
 
-https://github.com/avallete/todonextjs/assets/8771783/9805bdcf-7008-45ae-b91b-a6f75f3d5ef5
+[![asciicast](https://asciinema.org/a/63LZrysbUuEbd8GSGQhbtXNrU.svg)](https://asciinema.org/a/63LZrysbUuEbd8GSGQhbtXNrU)
 
 To create our desired 20 todos, we modify the `snaplet.todo` line accordingly:
 
@@ -89,37 +85,37 @@ await snaplet.todo((x) => x(20));
 Populating the database is then just a command away:
 
 ```bash
-npx snaplet generate
+npx tsx seed.mts
 ```
 
 And voila !
 
-https://github.com/avallete/todonextjs/assets/8771783/e1ecf3b9-7cd8-41c2-a7e4-84c36c1f5fbc
+![todolist](https://github.com/avallete/todonextjs/assets/8771783/e1ecf3b9-7cd8-41c2-a7e4-84c36c1f5fbc)
 
-Running `npx snaplet generate --sql` reveals the underlying SQL queries, showcasing the simplicity and power of `snaplet generate`:
+Running `DRY=1 npx tsx seed.mts` reveals the underlying SQL queries, showcasing the simplicity and power of `snaplet generate`:
 
 ```sql
-INSERT INTO public.todo (id,text,completed,created_at) VALUES
-(1, 'Acesto orum ad nullam de aris ut, efficiantur imad ab laetam si nobis exmultamen esse.', DEFAULT, DEFAULT),
-(2, 'Potiorem homin contra concordant conquis.', DEFAULT, DEFAULT),
-(3, 'Omi quid satiabilit quoddam venire appetenim a.', DEFAULT, DEFAULT),
-(4, 'Potest praesid ex gendos ant, scientia solum epicet suo etiam qui dicta.', DEFAULT, DEFAULT),
-(5, 'Et responender se e physicis nullo summum, ere quae et vero timumquam sent quibusu.', DEFAULT, DEFAULT),
-(6, 'Ut video mihi maxime alest, unum habet aut minimpedien consequantur congressuscip.', DEFAULT, DEFAULT),
-(7, 'Expeten domo tum parta inum saepe, dignitione de a liberos tum se homo qua.', DEFAULT, DEFAULT),
-(8, 'Homere nobis ex voluptate mihi possit vero, inclusae a gymnasia as poteramic ut vita.', DEFAULT, DEFAULT),
-(9, 'Homin delectatem et quam as desis.', DEFAULT, DEFAULT),
-(10, 'Inum torem nec vire dubio mihi illum per.', DEFAULT, DEFAULT),
-(11, 'Et rerum deorum dialectet orteat.', DEFAULT, DEFAULT),
-(12, 'Delecce perangore multi et illud, publictorquat is magisse ipsas referin neque sive.', DEFAULT, DEFAULT),
-(13, 'Siculassum eturus modum missimo iud quantum inis.', DEFAULT, DEFAULT),
-(14, 'Nihillo cohaeres aperta probartemper sunt.', DEFAULT, DEFAULT),
-(15, 'Quaedamicar recoristun neque a esse perspicuum.', DEFAULT, DEFAULT),
-(16, 'Quam repugientiam neque es enim tamentur provinandum, nobisse hominesse sublatincur eosque et corpus consequi itur.', DEFAULT, DEFAULT),
-(17, 'Sit totellatin bonae has et albucius diu efficerit, quidam gravisse si m nondum.', DEFAULT, DEFAULT),
-(18, 'Posse si erunturben a quibus enda necesse tem, desid in nec undia satiabillus afferre.', DEFAULT, DEFAULT),
-(19, 'Hac paulo a et est falsariam verbum sic, esse monstruosi idua aut debilitur non mediocritud haec.', DEFAULT, DEFAULT),
-(20, 'Ident fruuntur noscertae et proptervalet neque es.', DEFAULT, DEFAULT);
+INSERT INTO public.todo (id,text,completed,created_at) VALUES (1, 'Optinent finxeratem non graecis refere, et mollis aut eo probate a regultimor.', DEFAULT, DEFAULT),
+(2, 'Neque vestra aegritus eo omnino non suam nec.', DEFAULT, DEFAULT),
+(3, 'Vitament leganimped haec parte miraret ut indici est.', DEFAULT, DEFAULT),
+(4, 'Or improbo contra maleduniae quod melius ut.', DEFAULT, DEFAULT),
+(5, 'Sicutinum gravita chrysippi vero auditere quaeratorum.', DEFAULT, DEFAULT),
+(6, 'Docui quae dicant alit foedus scientia ut, corrupte opere aut accedunt parenimus id potest es.', DEFAULT, DEFAULT),
+(7, 'Ad non deorsummumque expetendis silio, enti gloriosae nomin compossunt acut graecistunt.', DEFAULT, DEFAULT),
+(8, 'Maxim qui quid a cum inquitation affecisdem nostri, moneranim antiquit sed sublaturi his principerin.', DEFAULT, DEFAULT),
+(9, 'Liberis inde maximproban solis exulis avis laudantiam seque, at laetit fert dictum il delicitat partis.', DEFAULT, DEFAULT),
+(10, 'Voluptatib iudicet et inime necesse adiuntur, ea angatur me principlinar multi quorumbram.', DEFAULT, DEFAULT),
+(11, 'Recus nec periis videbamic in.', DEFAULT, DEFAULT),
+(12, 'Et cum quae det tota eventi esticaren.', DEFAULT, DEFAULT),
+(13, 'Scientia quid num ad necest, tuum atrumvis odio dicunum is.', DEFAULT, DEFAULT),
+(14, 'Et habet enimpedien ex confirmat sequeret.', DEFAULT, DEFAULT),
+(15, 'Cum neces accederat eadem philos perantiam.', DEFAULT, DEFAULT),
+(16, 'Ocritudit ac telleganim eorum et est natur everita.', DEFAULT, DEFAULT),
+(17, 'Fautrica et sed ipsa vestiganim, quod moveat modus hoc dilignorat sed quietae.', DEFAULT, DEFAULT),
+(18, 'Delectamen summa ipsa utrumque cupid quos democritea constitut, lucifugnan ne omni conspirat nam et tua aequit.', DEFAULT, DEFAULT),
+(19, 'Ine talibus repererib dicatur itat non, dici ut quisit omnes scilicia.', DEFAULT, DEFAULT),
+(20, 'Plato virtutest ter terem maturus.', DEFAULT, DEFAULT);
+SELECT setval('"public"."todo_id_seq"'::regclass, (SELECT MAX("id") FROM "public"."todo"))
 ```
 
 ### Adapting to Changes:
