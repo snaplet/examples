@@ -21,7 +21,7 @@ Each example in this directory demonstrates a unique use case of the `seed` feat
 
 1. **Define Your Database Schema**: Before generating data, ensure your database schema is defined and reflects the relationships between different data entities.
 2. **Create a Data Generation Plan**: Translate your requirements into a data generation plan within the Snaplet configuration.
-3. **Run the seed Command**: Use `@snaplet/seed` to populate your database with the seedd data.
+3. **Run the seed script**: Use `@snaplet/seed` to generate a seed script to populate your database with the seedd data.
 
 For more detailed instructions, refer to the README within each example directory.
 
