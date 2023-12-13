@@ -1,12 +1,12 @@
-# Hasura Slack Clone: Effortless Database Seeding with Snaplet Generate
+# Hasura Slack Clone: Effortless Database Seeding with Snaplet seed
 
 ### What's This All About?
 
-In today's fast-paced development world, efficiently seeding a complex database is crucial for rapid application development. `Snaplet generate` offers a seamless solution, and in this post, we'll explore its powerful capabilities using a Hasura slack clone as a case study.
+In today's fast-paced development world, efficiently seeding a complex database is crucial for rapid application development. `@snaplet/seed` offers a seamless solution, and in this post, we'll explore its powerful capabilities using a Hasura slack clone as a case study.
 
 ### Our Approach
 
-To demonstrate the effectiveness of `snaplet generate`, we'll take a Hasura slack clone as our example. We'll deploy a local Hasura instance using the Hasura CLI and Docker, followed by employing `snaplet generate` to populate our app with data.
+To demonstrate the effectiveness of `@snaplet/seed`, we'll take a Hasura slack clone as our example. We'll deploy a local Hasura instance using the Hasura CLI and Docker, followed by employing `@snaplet/seed` to populate our app with data.
 
 ### Prerequisites
 
@@ -19,7 +19,7 @@ Setting up a working local environment is our first step. Here's how to get star
 
 1. Clone the Snaplet examples repository and navigate to the Hasura slack clone example:
    ```bash
-   git clone git@github.com:snaplet/examples.git && cd examples/generate/hasura-slack-clone
+   git clone git@github.com:snaplet/examples.git && cd examples/seed/hasura-slack-clone
    ```
 2. Install the necessary Node packages:
    ```bash
@@ -65,7 +65,7 @@ Select "No, I want to generate data locally" and enter the Docker database crede
 
 `postgres://postgres:postgrespassword@0.0.0.0:5433/postgres`
 
-This process generates a `snaplet.config.ts` file:
+This process generates a `seed.mts` file:
 
 ```ts
 import { copycat, faker } from "@snaplet/copycat";
@@ -87,10 +87,10 @@ export default defineConfig({
 
 ### Generating Data
 
-Now that we have our `snaplet.config.ts` file, we can generate data with the following command:
+Now that we have our `seed.mts` file, we can generate data with the following command:
 
 ```bash
-npx snaplet generate
+DRY=0 npx tsx generate
 ```
 
 With our current configuration this will create 2 workspace user types. Not very useful.
@@ -102,7 +102,7 @@ To build a more realistic environment, we plan to add:
 3. **Channels**: Each workspace will have 2 channels.
 4. **Messages**: We plan to create 2 messages in each channel.
 
-These additions will help us simulate a more authentic workspace environment, giving us a better platform to demonstrate the capabilities of `snaplet generate`.
+These additions will help us simulate a more authentic workspace environment, giving us a better platform to demonstrate the capabilities of `@snaplet/seed`.
 
 ```ts
 export default defineConfig({
@@ -134,7 +134,7 @@ export default defineConfig({
     },
   },
 });
-``````
+```
 
 Based on our configuration, here's what we expect:
 
@@ -147,7 +147,7 @@ Based on our configuration, here's what we expect:
 Let's generate the data and explore the result:
 
 ```bash
-npx snaplet generate
+DRY=0 npx tsx generate
 ```
 
 ![snaplet-generate-image-gif]()
@@ -195,7 +195,7 @@ Using this initial data pool, we then aim to:
 8. Create 2 messages per thread.
 9. Generate 20 messages between users across the workspaces.
 
-To implement this, we'll utilize the `snaplet generate` [$pipe operator](https://docs.snaplet.dev/core-concepts/generate#using-pipe).
+To implement this, we'll utilize the `@snaplet/seed` [$pipe operator](https://docs.snaplet.dev/core-concepts/generate#using-pipe).
 
 Let's see what it look like:
 
@@ -249,7 +249,7 @@ export default defineConfig({
 After adjusting our data generation strategy, let's run the command again to see the results:
 
 ```bash
-npx snaplet generate
+DRY=0 npx tsx generate
 ```
 
 ![snaplet-generate-image-gif]()
@@ -290,6 +290,6 @@ TODO: complete when smarterAutocomplete is ready
 
 ### Conclusions
 
-Through this journey, we've showcased the flexibility and power of `snaplet generate` in creating a realistic and intricate database for a Hasura Slack clone. From addressing unexpected data generation results to refining relationships for authenticity, Snaplet proves to be an indispensable tool for developers looking to efficiently model complex data scenarios.
+Through this journey, we've showcased the flexibility and power of `@snaplet/seed` in creating a realistic and intricate database for a Hasura Slack clone. From addressing unexpected data generation results to refining relationships for authenticity, Snaplet proves to be an indispensable tool for developers looking to efficiently model complex data scenarios.
 
 Whether you're a seasoned developer or just starting out, we hope this guide inspires you to explore the possibilities of Snaplet in your own projects. Dive in, experiment, and see how Snaplet can revolutionize your development workflow!
