@@ -10,7 +10,7 @@ Welcome to the Snaplet Examples repository, a comprehensive collection of applic
 
 ## Structure
 
-- `generate/`: Contains examples that illustrate how to use Snaplet's `generate` feature to create realistic, production-like data for your applications.
+- `seed/`: Contains examples that illustrate how to use Snaplet's `seed` feature to create realistic, production-like data for your applications.
 - `snapshot/`: Showcases the use of Snaplet's `snapshot` functionality to safely capture and transform production data for development use.
 
 For specific guidance on each feature, please refer to the individual directories.
