@@ -112,7 +112,7 @@ And voila !
 
 ![todolist](https://github.com/avallete/todonextjs/assets/8771783/e1ecf3b9-7cd8-41c2-a7e4-84c36c1f5fbc)
 
-Running `npx tsx seed.mts` reveals the underlying SQL queries, showcasing the simplicity and power of `snaplet generate`:
+Running `npx tsx seed.mts` reveals the underlying SQL queries, showcasing the simplicity and power of `snaplet seed`:
 
 ```sql
 INSERT INTO
