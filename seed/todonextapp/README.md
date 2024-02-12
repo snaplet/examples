@@ -41,11 +41,11 @@ model todo {
 
 Here's what the database ERD looks like:
 
-https://github.com/avallete/todonextjs/assets/8771783/097fce2f-9732-412e-bd30-d3cc76d96504
+![erd](https://github.com/avallete/todonextjs/assets/8771783/097fce2f-9732-412e-bd30-d3cc76d96504)
 
 With a straightforward interface and typical CRUD endpoints, our app quickly comes to life:
 
-https://github.com/avallete/todonextjs/assets/8771783/5896b6a7-7bb1-4bf1-8a85-b125c0177a83
+![demo](https://github.com/avallete/todonextjs/assets/8771783/5896b6a7-7bb1-4bf1-8a85-b125c0177a83)
 
 Imagine wanting to create numerous todos to test various functionalities. This is where diverse approaches come into play—some prefer seed classes for each model, others lean towards straightforward SQL or TS scripts. Let's introduce another method: `@snaplet/seed`.
 
