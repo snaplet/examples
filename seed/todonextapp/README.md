@@ -218,7 +218,7 @@ Then we can adapt our UI and api to reflect these changes by uncommenting the fo
 
 Our updated ERD schema:
 
-https://github.com/avallete/todonextjs/assets/8771783/06156217-8c3c-4ad1-a949-1a3e6cd434e3
+![updated-erd](https://github.com/avallete/todonextjs/assets/8771783/06156217-8c3c-4ad1-a949-1a3e6cd434e3)
 
 Now we want to re-introspect our database with `snaplet` to update our types with new values. We can do so by re-running our setup:
 ```bash
