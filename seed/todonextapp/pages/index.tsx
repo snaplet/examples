@@ -184,7 +184,7 @@ const App = () => {
           <Grid item xs={12} sm={6}>
             <h2>Todo Items</h2>
             {incompleteResults?.map((item) => (
-                <div key={item.id}>
+                <div key={item.id} className='todo-item'>
                   <FormControlLabel
                     control={<Checkbox checked={item.completed} onChange={(event) => handleCheckboxChange(event, item.id)} name="checked" />}
                     label={item.text}
@@ -200,7 +200,7 @@ const App = () => {
           <Grid item xs={12} sm={6}>
           <h2>Finished Items</h2>
           {completeResults?.map((item) => (
-              <div key={item.id}>
+              <div key={item.id} className='finished-item'>
                 <FormControlLabel
                   control={<Checkbox checked={item.completed} name="checked" onChange={(event) => handleCheckboxChange(event, item.id)}  />}
                   label={item.text}

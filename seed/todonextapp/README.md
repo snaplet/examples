@@ -212,7 +212,7 @@ npx prisma migrate dev --create-only && npx prisma db push --force-reset && npx 
 Then we can adapt our UI and api to reflect these changes by uncommenting the following lines:
 - `types.ts` (line 7-8)
 - `pages/index.tsx` (line 193-196)
-- `pages/api/todo.ts` (line 20-56)
+- `pages/api/todo.ts` (line 20-56 and line 93)
 - `pages/search.ts` (line 27-50)
 
 
@@ -288,8 +288,7 @@ This comprehensive approach saves us from maintaining a lengthy and complex seed
 
 ### Introduce snaplet to E2E testing
 
-Now, we have a convenient way to add data to our app. But what we really want is to ensure that this data is displayed properly by our interface, and that we can interact with it as wanted.
-To do this, one of the way is E2E testing, as it'll cover the whole pipeline between your data and your user and won't rely on your implementation, just on the behaviour.
+We've now established a convenient method for adding data to our application. However, what's crucial is ensuring that this data is accurately displayed by our interface, allowing us to interact with it as desired. One effective way to achieve this is through End-to-End (E2E) testing, as it encompasses the entire spectrum from your data to your user and hinges not on your implementation, but on the behavior..
 
 Here let's write 2 basics E2E tests that would ensure that:
 
@@ -304,47 +303,81 @@ If you think about this, those two E2E tests, will already cover a whole bunch o
 
 And by using `@snaplet/seed` rather than a handmade seeding script, you can declare and seed only the data that you care about in your test.
 
-So let's dig in, as a first we'll add [cypress](https://www.cypress.io/) E2E testing framework in our app.
+So let's dig in, as a first we'll add [playwright](https://playwright.dev/docs/intro) E2E web testing too our app.
 
-To do so, let's run and follow the [cypress onboarding docs](https://docs.cypress.io/guides/overview/why-cypress):
-
-```
-npm install cypress --save-dev
-```
-
-Then we configure cypress for our project by following their onboarding:
+To do so, let's run and follow the [playwright onboarding docs](https://playwright.dev/docs/intro):
 
 ```
-./node_modules/.bin/cypress open
+npm init playwright@latest
 ```
 
-Then we can write a cypress test file `actions-on-todo.cy.ts` and put the following content in it:
+Then we can configure a playwright test file to execute the tests we mentioned before under `tests/todos-actions.spec.ts`
+
+With the following content in it:
 
 ```ts
+import { test, expect } from '@playwright/test';
 import { createSeedClient } from "@snaplet/seed";
 
-describe('todos actions tests', () => {
-  it('can mark a unfinished todo as finished', async () => {
-    // 1. We create a new seed client
+test.describe('Todo App actions', () => {
+  // Run tests in serial order because they're hitting the same database
+  test.describe.configure({mode: 'serial'})
+
+  test('can mark an unfinished todo as finished', async ({ page }) => {
     const seed = await createSeedClient({
       dryRun: false
     });
-    // 2. We reset the database for it
-    await seed.$resetDatabase()
-    // 3. We create a single todo in our app with an "unfinished" status
-    await seed.todos((x) => x(1, () => ({
-      completed: false,
-      text: 'can mark a unfinished todo as finished'
-    })))
-    cy.visit('localhost:3000')
+    
+    // Clears all existing data in the database, but keep the structure
+    await seed.$resetDatabase();
+    // We create a single unfinished todo in the database
+    await seed.todos((x) => x(1, { completed: false, text: 'todo-body' }));
+    await page.goto('http://localhost:3000/');
+    // Check if the new task is added to the "Todo Items" section
+    const todoItem = page.locator('.todo-item:has-text("todo-body")');
+    await expect(todoItem).toHaveCount(1);
+    // Click the checkbox to mark the todo as finished
+    await todoItem.locator('input[type="checkbox"]').click();
+    // Check if the task is moved to the "Finished Items" section
+    const finishedItem = page.locator('.finished-item:has-text("todo-body")');
+    await expect(finishedItem).toHaveCount(1)
+  });
+  
+  test('can mark a finished todo as unfinished', async ({ page }) => {
+    const seed = await createSeedClient({
+      dryRun: false
+    });
+    
+    // Clears all existing data in the database, but keep the structure
+    await seed.$resetDatabase();
+    // We create a single unfinished todo in the database
+    await seed.todos((x) => x(1, { completed: true, text: 'todo-body' }));
+    await page.goto('http://localhost:3000/');
+    // Check if the task is moved to the "Finished Items" section
+    const finishedItem = page.locator('.finished-item:has-text("todo-body")');
+    await expect(finishedItem).toHaveCount(1)  
+    // Click the checkbox to mark the todo as unfinished
+    await finishedItem.locator('input[type="checkbox"]').click();
+    // Check if the new task is added to the "Todo Items" section
+    const todoItem = page.locator('.todo-item:has-text("todo-body")');
+    await expect(todoItem).toHaveCount(1);
   })
 })
 ```
 
+Running it with playwright --ui we can see that our tests are performing as we expect:
+
+```
+npx playwright test --ui
+```
+
+![playwright-run](https://github.com/snaplet/docs/assets/8771783/9f1ad0af-d597-43b5-ada6-affd602ce28a)
 
 ### Conclusion
 
 In our exploration of `@snaplet/seed`, we've seen its capability in simplifying the creation and maintenance of seed scripts, particularly as your project requirements evolve. It stands as a robust tool in your development toolkit, adapting seamlessly to changes and enhancements in your project.
+
+We have also covered how we can simply integrate it with E2E testing to ensure that our data is properly displayed and interacted with by our users. Additionally, we plan to create recipes for other testing tools and advanced use cases, such as parallel testing, in the future.
 
 For a comprehensive understanding of all the features, our [seed documentation](https://docs.snaplet.dev/core-concepts/seed) is an invaluable resource. It covers everything you need to know to make the most out of `seed`.
 
