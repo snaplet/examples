@@ -90,6 +90,7 @@ export default async function handler(
             },
           })
         } else {
+          // await db.vote.deleteMany();
           await db.todo.deleteMany();
         }
         res.status(204).end();
