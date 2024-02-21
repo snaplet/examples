@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@snaplet/seed": "^0.77.2",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
     "hasura-cli": "^2.35.1",
