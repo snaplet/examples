@@ -1,0 +1,18 @@
+{
+  "name": "hasura-slack-backend",
+  "version": "1.0.0",
+  "description": "We will be building the backend of a basic Slack clone, setting up permissions so that the right data is exposed to the right user. There won't be any front-end app building associated with this.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
+    "hasura-cli": "^2.35.1",
+    "snaplet": "^0.77.2",
+    "tsx": "^4.6.2"
+  }
+}
