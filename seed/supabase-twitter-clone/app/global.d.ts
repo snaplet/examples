@@ -1,11 +1,10 @@
-import { Database as Db } from "@/lib/database.types";
+import { Database as DB } from "@/lib/database.types";
 
-type Tweet = Db["public"]["Tables"]["tweets"]["Row"];
-type Profile = Db["public"]["Tables"]["profiles"]["Row"];
+type Tweet = DB["public"]["Tables"]["tweets"]["Row"];
+type Profile = DB["public"]["Tables"]["profiles"]["Row"];
 
 declare global {
-  type Database = Db;
-
+  type Database = DB;
   type TweetWithAuthor = Tweet & {
     author: Profile;
     likes: number;

@@ -4,12 +4,18 @@ import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
+const inDevEnvironment = !!process && process.env.NODE_ENV === 'development';
+
 export async function GET(request: NextRequest) {
+    if (!inDevEnvironment) {
+        return NextResponse.redirect('/')
+    }
     const requestUrl = new URL(request.url);
-    const code = requestUrl.searchParams.get("code");
-    if (code) {
+    const email = requestUrl.searchParams.get("email");
+    const password = requestUrl.searchParams.get("password");
+    if (email && password) {
         const supabase = createRouteHandlerClient({ cookies })
-        console.log(await supabase.auth.exchangeCodeForSession(code))
+        await supabase.auth.signInWithPassword({ email, password })
     }
     return NextResponse.redirect(requestUrl.origin)
 } 
