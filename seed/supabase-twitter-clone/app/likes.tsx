@@ -1,6 +1,7 @@
 "use client";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useTransition } from "react";
 
 export default function Likes({
   tweet,
@@ -9,6 +10,7 @@ export default function Likes({
   tweet: TweetWithAuthor;
   addOptimisticTweet: (newTweet: TweetWithAuthor) => void;
 }) {
+  const [transitioning, startTransition] = useTransition();
   const handleLikes = async () => {
     const supabase = createClientComponentClient<Database>();
     const {
@@ -38,7 +40,7 @@ export default function Likes({
     }
   };
   return (
-    <button onClick={handleLikes} className="group flex items-center">
+    <button onClick={() => transitioning === false && startTransition(() => handleLikes())} className="group flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
