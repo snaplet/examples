@@ -2,20 +2,47 @@
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Likes from "./likes";
-import { useEffect, useOptimistic } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useCallback, useRef, useState, useLayoutEffect } from "react";
 
-export default function Tweets({ tweets }: { tweets: TweetWithAuthor[] }) {
+function useOptimistic<T, P>(
+  passthrough: T,
+  reducer: (state: T, payload: P) => T
+) {
+  const [value, setValue] = useState(passthrough);
+
+  useEffect(() => {
+    setValue(passthrough);
+  }, [passthrough]);
+
+  const reducerRef = useRef(reducer);
+  useLayoutEffect(() => {
+    reducerRef.current = reducer;
+  }, []);
+
+  const dispatch = useCallback(
+    (payload: P) => {
+      setValue(reducerRef.current(passthrough, payload));
+    },
+    [passthrough]
+  );
+
+  return [value, dispatch] as const;
+}
+
+export default function Tweets({
+  tweets,
+}: {
+  tweets: Record<string, TweetWithAuthor>;
+}) {
   const [optimisticTweets, addOptimisticTweet] = useOptimistic<
-    TweetWithAuthor[],
+    Record<string, TweetWithAuthor>,
     TweetWithAuthor
   >(tweets, (currentOptimisticTweets, newTweet) => {
-    const newOptimisticTweets = [...currentOptimisticTweets];
-    const index = newOptimisticTweets.findIndex(
-      (tweet) => tweet.id === newTweet.id
-    );
-    newOptimisticTweets[index] = newTweet;
+    const newOptimisticTweets = { ...currentOptimisticTweets };
+    newOptimisticTweets[newTweet.id] = newTweet;
     return newOptimisticTweets;
   });
 
@@ -43,8 +70,7 @@ export default function Tweets({ tweets }: { tweets: TweetWithAuthor[] }) {
     };
   }, [supabase, router]);
 
-
-  return optimisticTweets.map((tweet) => (
+  return Object.values(optimisticTweets).map((tweet) => (
     <div
       key={tweet.id}
       className="border border-gray-800 border-t-0 px-4 py-8 flex"

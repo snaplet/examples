@@ -24,14 +24,17 @@ export default async function Home() {
     .order("created_at", { ascending: false });
 
   const tweets =
-    data?.map((tweet) => ({
-      ...tweet,
-      author: Array.isArray(tweet.author) ? tweet.author[0] : tweet.author,
-      user_has_liked_tweet: !!tweet.likes.find(
-        (like: { user_id: string }) => like.user_id === session.user.id
-      ),
-      likes: tweet.likes.length,
-    })) ?? [];
+    data?.reduce((acc, tweet) => {
+      acc[tweet.id] = {
+        ...tweet,
+        author: Array.isArray(tweet.author) ? tweet.author[0] : tweet.author,
+        user_has_liked_tweet: !!tweet.likes.find(
+          (like: { user_id: string }) => like.user_id === session.user.id
+        ),
+        likes: tweet.likes.length,
+      };
+      return acc;
+    }, {}) ?? {};
 
   return (
     <div className="w-full max-w-xl mx-auto">
