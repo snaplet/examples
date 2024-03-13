@@ -60,7 +60,7 @@ export default function Tweets({
           table: "tweets",
         },
         () => {
-          router.refresh();
+          router.refresh()
         }
       )
       .subscribe();
@@ -70,10 +70,11 @@ export default function Tweets({
     };
   }, [supabase, router]);
 
-  return Object.values(optimisticTweets).map((tweet) => (
+  return Object.values(optimisticTweets).map((tweet, idx) => (
     <div
       key={tweet.id}
       className="border border-gray-800 border-t-0 px-4 py-8 flex"
+      data-testid={`tweet-${idx}`}
     >
       <div className="h-12 w-12">
         <Image

@@ -1,95 +1,96 @@
-# Supabase + NextJS Twitter Clone: Local development and E2E testing with Snaplet Seed
+# Supabase + NextJS Twitter Clone: Local Development and E2E Testing with Snaplet Seed
 
-### What's this all about ?
+## What's This All About?
 
-In this example, we will be re-using the supabase tutorial to [Build a Twitter Clone](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb?af=9qsk0a) and demonstrate how to use snaplet seed to develop and test the application locally very easily.
+In this tutorial, we'll leverage the Supabase guide to [Build a Twitter Clone](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb?af=9qsk0a) and demonstrate how to use Snaplet Seed for efficient local development and testing. Snaplet Seed simplifies the process of developing and testing your application by providing a method to easily seed your local environment with data.
 
-### Our Approach
+## Our Approach
 
-To demonstrate how to integrate snaplet seed in your supabase development workflow, we will be doing two things:
+We aim to integrate Snaplet Seed into your Supabase development workflow by:
 
-1. We will show the easiest method to seed up a local development environment for the supabase twitter clone using snaplet seed. Demonstrating how to login as a user with some data already preffiled in it.
-2. We will show how to write end-to-end tests for the supabase twitter clone using snaplet seed to create the tests personas.
+1. Illustrating the simplest method to seed a local development environment for the Supabase Twitter clone using Snaplet Seed, including how to log in as a user with pre-filled data.
+2. Demonstrating how to write end-to-end tests for the Supabase Twitter clone, using Snaplet Seed to create test personas.
 
-### Prerequisites
+## Prerequisites
 
-- You should either have read the supabase original tutorial [here](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb?af=9qsk0a) or have some knowledge of NextJS and Supabase.
-- Node.js and npm: [Installation Guide](https://github.com/nvm-sh/nvm#usage)
-- Docker and docker-compose: [Get Docker](https://docs.docker.com/get-docker/)
+- Familiarity with the original Supabase tutorial [here](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb?af=9qsk0a) or a basic understanding of NextJS and Supabase.
+- Node.js and npm installed. See the [Installation Guide](https://github.com/nvm-sh/nvm#usage).
+- Docker and Docker-compose installed. [Get Docker](https://docs.docker.com/get-docker/).
 
-### Getting Started
+## Getting Started
 
-1. Let's first clone our examples repository and navigate to the supabase example:
-```bash
-git clone git@github.com:snaplet/examples.git && cd examples/seed/supabase-twitter-clone
-```
+1. Clone the examples repository and navigate to the Supabase example:
+
+    ```bash
+    git clone git@github.com:snaplet/examples.git && cd examples/seed/supabase-twitter-clone
+    ```
 
 2. Install the dependencies:
-```bash
-npm install
-```
 
-So here, we are, we now have a supabase twitter clone project. If you didn't follow the tutorial here is the outline of what's inside this clone that will be of interest to us during this tutorial:
+    ```bash
+    npm install
+    ```
 
-1. We have a Oauth login with github
-2. We have a feed page where we can see the tweets of everyone connected, connected users can also post tweets, like or unlike tweets.
-3. We have real-time updates on the feed page when other users post tweets.
+Now, you have a Supabase Twitter clone project set up. If you haven't followed the tutorial, here's what you need to know about this clone for this tutorial:
 
-### Local Development with supabase
+- It includes OAuth login with GitHub.
+- Features a feed page where users can see everyone's tweets, post tweets, and like or unlike tweets.
+- Supports real-time updates on the feed page when other users post tweets.
 
-The first thing we want to do is to setup a local development environment for the supabase twitter clone.
-So let's first follow the [Supabase docs](https://supabase.com/docs/guides/cli/local-development) about it:
+## Local Development with Supabase
 
-First we need to login using the supabase cli and init the project for supabase local development:
-```bash
-npx supabase login
-npx supabase init
-```
+First, let's set up a local development environment for the Supabase Twitter clone. Follow the [Supabase documentation](https://supabase.com/docs/guides/cli/local-development) for guidance:
 
-[![supabase-init](https://asciinema.org/a/d1B5ZcVDiHth3X7qodf3h4rZM.svg)](https://asciinema.org/a/d1B5ZcVDiHth3X7qodf3h4rZM)
+1. Login using the Supabase CLI and initialize the project for local development:
 
-This will have created a new "supabase" folder in our project with some files in it. But we now need to sync our local project
-with the one we created and setup on supabase. To do that we need to run the following command:
+    ```bash
+    npx supabase login
+    npx supabase init
+    ```
 
-```bash
-# Your projectID can be found using supabase projects list command and getting the REFERENCE ID value
-# then input your remote database password when asked to
-npx supabase link --project-ref <your-twitter-clone-project-id>
-# We need a valid migrations folder for supabase to pull the first migration in
-mkdir -p supabase/migrations
-# Now we can pull the database schema from the remote project
-npx supabase db pull
-```
+    ![supabase-init](https://asciinema.org/a/d1B5ZcVDiHth3X7qodf3h4rZM.svg)
 
-This will have created a new file `supabase/migrations` folder with a `remote_schema.sql` file in it. But this migration is missing the triggers and publications that we need for our real-time updates to work. So we need to add them manually to the `remote_schema.sql` file:
+2. Sync your local project with your Supabase project:
+
+    ```bash
+    # Your projectID can be found using the `supabase projects list` command and noting the REFERENCE ID value.
+    # Input your remote database password when prompted.
+    npx supabase link --project-ref <your-twitter-clone-project-id>
+    # Create a valid migrations folder for Supabase to pull the first migration.
+    mkdir -p supabase/migrations
+    # Pull the database schema from the remote project.
+    npx supabase db pull
+    ```
+
+This process creates a new `remote_schema.sql` file within the `supabase/migrations` folder. However, this migration lacks the necessary triggers and publications for our real-time updates to function correctly. Thus, we need to manually add them to the `remote_schema.sql` file:
 
 ```sql
--- append at the end
--- We create our trigger to create a profile for a user when it's created
+-- Append at the end
+-- Trigger to create a profile for a user upon creation
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION "public"."create_profile_for_user"();
--- We create our publication for the tweets table to enable realtime on it
+-- Publication for the tweets table to enable real-time functionality
 ALTER PUBLICATION "supabase_realtime" ADD TABLE "public"."tweets";
 RESET ALL;
 ```
 
-The, we must sync our local development project with the remote one:
+Next, we must synchronize our local development project with the remote one:
 
 ```bash
 npx supabase migration repair --status applied
 ```
 
-This will push our current migration to the remote project so it's in sync with the remote project.
+This command aligns our current migration with the remote project, ensuring both are in sync.
 
 [![supabase-db-pull](https://asciinema.org/a/2FvlJxh6CH8eJciakpY3C2Bjy.svg)](https://asciinema.org/a/2FvlJxh6CH8eJciakpY3C2Bjy)
 
-Then we're finally ready to start our local development environment:
+With these steps completed, we're now ready to launch our local development environment:
 
 ```bash
 npx supabase start
 
 Applying migration 20240312132633_remote_schema.sql...
-Seeding data supabase/seed.sql...
-Started supabase local development setup.
+Seeding data with supabase/seed.sql...
+Supabase local development setup is now running.
 
          API URL: http://127.0.0.1:54321
      GraphQL URL: http://127.0.0.1:54321/graphql/v1
@@ -101,7 +102,7 @@ Started supabase local development setup.
 service_role key: <service-role-key>
 ```
 
-Now, we want to setup those development values for our nextjs project. We can do that by creating a `.env` file in the root of our project and adding the following values:
+To finalize the setup, we configure our NextJS project with the necessary development values. This is achieved by creating a `.env` file at the project root and populating it with the following entries:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
@@ -109,32 +110,32 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
 NEXT_BASE_APP_URL=http://127.0.0.1:3000
 ```
 
-### Setup OAuth for local development
+### Setup OAuth for Local Development
 
-Our supabase twitter clone uses OAuth of github to login. Issue is that we can't use the same OAuth credentials for our local development environment. So we need to create a new OAuth application on github and use those credentials for our local development.
+Our Supabase Twitter clone uses GitHub OAuth for login. However, we cannot use the same OAuth credentials for our local development environment. Therefore, we need to create a new OAuth application on GitHub specifically for local development.
 
-To do that, go to your github account, developer settings and navigate to the OAuth applications section. Then create a new OAuth application with the following values:
+To accomplish this, navigate to your GitHub account's developer settings and access the OAuth applications section. Create a new OAuth application with the following settings:
 
-- Homepage URL: http://127.0.0.1:3000
-- Authorization callback URL: http://localhost:54321/auth/v1/callback
+- Homepage URL: `http://127.0.0.1:3000`
+- Authorization callback URL: `http://localhost:54321/auth/v1/callback`
 
-Copy it's client id and secret and add them to your `.env` file:
+After creation, copy the client ID and secret, and add them to your `.env` file:
 
 ```bash
 SUPABASE_AUTH_GITHUB_CLIENT_ID=<app-client-id>
 SUPABASE_AUTH_GITHUB_SECRET=<app-client-secret>
 ```
 
-Now, we wan to activate the OAuth login for our local development environment. To do that, we need to edit the `supabase/config.toml` file like so:
+Next, to activate OAuth login for our local environment, modify the `supabase/config.toml` file as follows:
 
 ```toml
 [auth]
 #...
-# We need ot add our redirect to the additional_redirect_urls
-additional_redirect_urls = ["https://127.0.0.1:3000", "http://localhost:54321/auth/v1/callback"]
+# Add our redirects to the additional_redirect_urls
+additional_redirect_urls = ["http://127.0.0.1:3000", "http://localhost:54321/auth/v1/callback"]
 #...
 
-# Configuration for github OAuth provider
+# Configuration for GitHub OAuth provider
 [auth.external.github]
 enabled = true
 client_id = "env(SUPABASE_AUTH_GITHUB_CLIENT_ID)"
@@ -142,14 +143,14 @@ secret = "env(SUPABASE_AUTH_GITHUB_SECRET)"
 redirect_uri = "http://localhost:54321/auth/v1/callback"
 ```
 
-For the changes to take effect, we need to restart our supabase local development environment:
+For the changes to take effect, restart the Supabase local development environment:
 
 ```bash
 npx supabase stop --no-backup
 npx supabase start
 ```
 
-And we should also be able to run our next dev server and login with github:
+Now, running our Next.js dev server should allow login via GitHub:
 
 ```bash
 npm run dev
@@ -163,17 +164,15 @@ npm run dev
  ✓ Ready in 1727ms
 ```
 
-![github-login](https://github.com/snaplet/examples/assets/8771783/9dca1ab2-08ff-4fa8-a71e-31164533e9d2)
+![GitHub login](https://github.com/snaplet/examples/assets/8771783/9dca1ab2-08ff-4fa8-a71e-31164533e9d2)
 
-Alright now we can "use" our app but oauth login is not really the best way to automate testing and quickly login to different personas.
-It would require multiples github account and that's not really convenient so let's fix that !
+Although OAuth login works, it's not the most efficient method for automating testing or quickly logging into different personas, as it would require multiple GitHub accounts. Let's address this issue next.
 
-### Setup a email+password login for local development:
+### Setup an Email+Password Login for Local Development
 
-For local development and testing, we want to be able to login as different personas easily. We can do that by creating a new user with some data already prefilled in it. We can do that by creating a new user with a email+password login and then use the supabase admin to add some data to it.
+For local development and testing, it's crucial to have the ability to log in as different personas easily. This can be achieved by creating a new user with pre-filled data. We can facilitate this by setting up an email and password login mechanism, and then utilize the Supabase admin interface to add specific data to it.
 
-First, we will create an utils route for development, this route will allows us to easily login as a user with email+password.
-So let's create a new route under `app/auth/dev/login/route.ts` with the following content in it:
+Firstly, we'll create a utility route for development purposes. This route will allow us to easily log in as a user using an email and password. To accomplish this, create a new route at `app/auth/dev/login/route.ts` with the following content:
 
 ```ts
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
@@ -185,129 +184,96 @@ export const dynamic = "force-dynamic";
 const inDevEnvironment = !!process && process.env.NODE_ENV === 'development';
 
 export async function GET(request: NextRequest) {
-    // We want to enable this route for development/testing only
+    // This route is intended for development/testing purposes only
     if (!inDevEnvironment) {
         return NextResponse.redirect('/')
     }
     const requestUrl = new URL(request.url);
-    // We extract the email and password from the query params
+    // Extract email and password from query parameters
     const email = requestUrl.searchParams.get("email");
     const password = requestUrl.searchParams.get("password");
     if (email && password) {
-        const supabase = createRouteHandlerClient({ cookies })
-        // We sign in the user with email+password
-        await supabase.auth.signInWithPassword({ email, password })
+        const supabase = createRouteHandlerClient({ cookies });
+        // Sign in the user with email and password
+        await supabase.auth.signInWithPassword({ email, password });
     }
-    return NextResponse.redirect(requestUrl.origin)
+    return NextResponse.redirect(requestUrl.origin);
 }
 ```
 
-With that in place, we can now easily login as a user with email+password by visiting the following url:
+With this setup, we can now easily log in as a user using email and password by navigating to:
 `http://localhost:3000/api/auth/dev/login?email=<user-email>&password=<user-password>`
 
-But we still need to create a new user with email+password. This is where snaplet seed will come into play.
+However, we still need to create a new user with email and password. This is where Snaplet Seed will be utilized.
 
 ### Setup @snaplet/seed
 
-First, we want to setup snaplet for our project. To do so we simply run snaplet setup and follow the instructions,
-using our local development supabase database as a target (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`)
+Firstly, initialize Snaplet for our project by running `snaplet setup` and follow the on-screen instructions, targeting our local development Supabase database (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`).
 
 [![snaplet-setup](https://asciinema.org/a/GQTPGHS0dnG7NZ0KqzJM7uWpq.svg)](https://asciinema.org/a/GQTPGHS0dnG7NZ0KqzJM7uWpq)
 
-This will generate a `seed.mts` file looking like this:
+This generates a `seed.mts` file as shown below:
 
 ```ts
 import { createSeedClient } from '@snaplet/seed';
-
-// You can use @snaplet/copycat to generate fake data for a field, for example:
-// ```
-// await seed.users([{ email: ({ seed }) => copycat.email(seed) }])
-// ```
-// More on this in our docs: https://docs.snaplet.dev/core-concepts/seed#inside-the-snapletseed-workflow
-import { copycat } from '@snaplet/copycat'
-
-// This is a basic example generated by Snaplet to start you off, check out the docs for where to go from here
-// * For more on getting started with @snaplet/seed: https://docs.snaplet.dev/getting-started/quick-start/seed
-// * For a more detailed reference: https://docs.snaplet.dev/core-concepts/seed
-
+import { copycat } from '@snaplet/copycat';
 
 const seed = await createSeedClient({
   dryRun: process.env.DRY !== '0',
 });
 
-// Clears all existing data in the database, but keep the structure
+// Reset the database, keeping the structure intact
 await seed.$resetDatabase()
 
-
-// This will create 3 records in the HttpResponses table
-// it reads HttpResponses times(x) 3
+// Create 3 records in the HttpResponses table
 await seed.HttpResponses(x => x(3))
 
-// Run it with: DRY=0 npx tsx seed.mts
+// Execute with: DRY=0 npx tsx seed.mts
 ```
 
-By default snaplet will pull everything in our database, but for supabase, we want to be able to pull only to some of the schemas.
-To do so, let's add a `snaplet.config.ts` file in the root of our project with the following content:
+By default, Snaplet will pull all data from our database. For Supabase, we prefer to pull only specific schemas. Let's create a `snaplet.config.ts` file at the project root with the following configuration:
 
 ```ts
-/// <reference path=".snaplet/snaplet.d.ts" />
-import {defineConfig} from 'snaplet'
+import { defineConfig } from 'snaplet';
 
 export default defineConfig({
     select: {
         $default: false,
         auth: {
             $default: false,
-            // We only want those tables so our $resetDatabase flush all existing users or sessions
             users: true,
             identities: true,
             sessions: true,
         },
         public: true,
     }
-})
+});
 ```
 
-Now let's regenerate our seed file with the new configuration:
-[![snaplet-setup-generate](https://asciinema.org/a/wtyKxRZB6p3i0R4SO6Hoqwx1s.svg)](https://asciinema.org/a/wtyKxRZB6p3i0R4SO6Hoqwx1s)
+Regenerate the seed file with the new configuration to apply these settings.
 
-Now let's see if we can generate some tweets, by editing our `seed.mts` file to:
+Now, let's edit our `seed.mts` file to generate some tweets:
 
 ```ts
 import { createSeedClient } from '@snaplet/seed';
-
-// You can use @snaplet/copycat to generate fake data for a field, for example:
-// ```
-// await seed.users([{ email: ({ seed }) => copycat.email(seed) }])
-// ```
-// More on this in our docs: https://docs.snaplet.dev/core-concepts/seed#inside-the-snapletseed-workflow
-import { copycat } from '@snaplet/copycat'
-
-// This is a basic example generated by Snaplet to start you off, check out the docs for where to go from here
-// * For more on getting started with @snaplet/seed: https://docs.snaplet.dev/getting-started/quick-start/seed
-// * For a more detailed reference: https://docs.snaplet.dev/core-concepts/seed
-
+import { copycat } from '@snaplet/copycat';
 
 const seed = await createSeedClient({
   dryRun: process.env.DRY !== '0',
 });
 
-// Clears all existing data in the database, but keep the structure
 await seed.$resetDatabase()
 
-
+// Generate 10 tweets
 await seed.tweets(x => x(10))
 ```
 
-Then if we run it via `DRY=0 npx tsx seed.mts` we can head to our localhost dev server, but we see an error from next/images mentionning that the avatar_url is invalid.
-
-Indeed, we want to have valid urls coming from github as avatar_url (as mentioned in the `next.config.mjs` file). To do so, we can simply override how the avatar_url is generated in our `seed.mts` file at the model level:
+After running `DRY=0 npx tsx seed.mts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.mts`:
 
 ```ts
 const seed = await createSeedClient({
   dryRun: process.env.DRY !== '0',
   models: {
-    // Here we ensure that for any profiles the avatarUrl will be a valid github avatar
     profiles: {
       data: {
         avatarUrl: ({ seed }) => faker.image.avatarGitHub(),
@@ -316,46 +282,33 @@ const seed = await createSeedClient({
   }
 });
 
-// Clears all existing data in the database, but keep the structure
 await seed.$resetDatabase()
 
-
+// Generate 10 tweets with valid avatar URLs
 await seed.tweets(x => x(10))
 ```
 
-Let's re-run `DRY=0 npx tsx seed.mts` and refresh our page, we should now be able to see our seeded tweets data:
+Refreshing our page should now display the seeded tweet data correctly.
 
-![tweet-generated](https://github.com/snaplet/examples/assets/8771783/2e6a3740-03b6-425b-a950-ed57fefc3b73)
-
-
-That's great, but what we would like is to be able to login as a the creator of those tweets easily.
-To do so, we can leverage supabase sdk to sign up a pool of users, and use them in our seed script.
-
-First, we want to create a new supabase client inside our seed script:
+To easily log in as the creators of these tweets, we integrate the Supabase SDK into our seed script:
 
 ```ts
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-```
-
-Then, we want to create a pool of 5 differents users and sign them up with a email+password login:
-
-```ts
-import { type profilesScalars } from '@snaplet/seed';
-
+);
 
 const PASSWORD = "testuser";
-for (let i = 0; i < 5; i += 1) {
+for (let i = 0; i < 5; i++) {
   const email = copycat.email(i).toLowerCase();
-  const avatar: string = faker.image.avatarGitHub();
-  const fullName: string = copycat.fullName(i);
-  const userName: string = copycat.username(i);
+  const avatar = faker.image.avatarGitHub();
+  const fullName = copycat.fullName(i);
+  const userName = copycat.username(i);
+  
   await supabase.auth.signUp({
-      email,
-      password: PASSWORD,
-      options: {
+    email,
+    password: PASSWORD,
+    options: {
       data: {
         avatar_url: avatar,
         name: fullName,
@@ -364,28 +317,24 @@ for (let i = 0; i < 5; i += 1) {
     }
   });
 }
-// In our app, all our data under public isn't directly linked under the auth.user table but rather under the public.profiles table
-// And for any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
-// Since `supabase.auth.signUp` create a user, we should now have all the profiles created as well
-const { data: databaseProfiles } = await supabase.from("profiles").select()
-//  We convert our database fields to something that our seed client can understand
-const profiles: profilesScalars[] = databaseProfiles?.map(profile => ({
+
+const { data: databaseProfiles } = await supabase.from("profiles").select();
+
+const profiles = databaseProfiles?.map(profile => ({
   avatarUrl: profile.avatar_url,
   id: profile.id,
   name: profile.name,
   username: profile.username,
-})) ?? []
+})) ?? [];
+
+// Insert tweets linked to profiles
+await seed.tweets(x => x(10), { connect: { profiles } });
+console.log("Profiles created: ", profiles);
 ```
 
-Then, we can use those profiles to create our tweets and log them in our output so we can try to connect to it:
+This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator.
 
-```ts
-// We can now use our seed client to insert tweets that will be linked to the profiles
-await seed.tweets(x => x(10), {connect: { profiles }})
-console.log("Profiles created: ", profiles)
-```
-
-If we put them all togethers we get the following `seed.mts` file:
+Combining all the steps, our `seed.mts` file becomes:
 
 ```ts
 import { createSeedClient, type profilesScalars } from '@snaplet/seed';
@@ -450,10 +399,207 @@ await seed.tweets(x => x(10), {connect: { profiles }})
 console.log('Profiles created: ', profiles)
 ```
 
-Now let's re-run `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> DRY=0 npx tsx seed.mts`:
+Re-run the seed script with the environment variables set to your local Supabase instance:
+
+`NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> DRY=0 npx tsx seed.mts`:
 
 [![snaplet-seed-users-and-tweets](https://asciinema.org/a/sItlFhIlrQ8E4bQm7TlBgMIya.svg)](https://asciinema.org/a/sItlFhIlrQ8E4bQm7TlBgMIya)
 
-We can now head to our supabase admin and see that we have 5 new users and 10 new tweets in our database. And we can use our `app/auth/dev/login` route to login as any of those users:
+Now, visiting the Supabase admin panel will reveal 5 new users and 10 new tweets in our database. Utilizing the app/auth/dev/login route allows us to log in as any of these users:
 
 ![demo-signup](https://github.com/snaplet/examples/assets/8771783/de524d62-a6ac-4cad-b19d-e4f932a01c30)
+
+### Snaplet Seed with E2E
+
+With our local development environment prepared and populated with data, we can leverage Snaplet Seed to create personas for our end-to-end tests. Our objectives include testing behaviors such as:
+
+1. A user can log in and view the feed.
+2. A user can post a tweet.
+3. A user can like a tweet.
+
+First, let's add Playwright to our project:
+
+```bash
+npm init playwright@latest
+```
+
+To configure Playwright for our local development environment, we create a playwright.config.ts in the project root with the following setup:
+
+```ts
+  webServer: {
+    command: 'npx supabase start && npm run dev',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+  use: {
+    baseURL: 'http://127.0.0.1:3000',
+    trace: 'on-first-retry',
+  }
+```
+
+Next, we'll create a new test file e2e.spec.ts at the project root. To facilitate user creation and login in our tests, we include some utility functions:
+  
+```ts
+import { test, expect, type Page } from '@playwright/test';
+import { createSeedClient, type profilesScalars } from "@snaplet/seed";
+import { createClient } from '@supabase/supabase-js'
+import {Database} from '../lib/database.types'
+import { copycat, faker } from '@snaplet/copycat'
+
+const PASSWORD = "testuser";
+
+async function login(page: Page, {email, password}: {email: string, password: string}) {
+  await page.goto(`./auth/dev/login?email=${email}&password=${password}`);
+}
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+)
+
+async function createSupabaseUser(seed: string): Promise<profilesScalars & {email: string}> {
+  const email = copycat.email(seed).toLowerCase();
+  const avatar: string = faker.image.avatarGitHub();
+  const fullName: string = copycat.fullName(seed);
+  const userName: string = copycat.username(seed);
+  const user = await supabase.auth.signUp({
+      email,
+      password: PASSWORD,
+      options: {
+      data: {
+        avatar_url: avatar,
+        name: fullName,
+        user_name: userName,
+      }
+    }
+  });
+  return { id: user.data.user?.id, avatarUrl: avatar, name: fullName, username: userName, email};
+}
+
+async function createAndLoginUser(page: Page, seed: string): Promise<profilesScalars> {
+  const user = await createSupabaseUser(seed);
+  await login(page, {email: user.email, password: PASSWORD});
+  return { id: user.id, avatarUrl: user.avatarUrl, name: user.name, username: user.username};
+}
+```
+
+To ensure tests start from a clean state, we reset our database before each test using Snaplet Seed:
+
+```ts
+test.describe('Twitter Clone actions', () => {
+  test.describe.configure({mode: 'serial'})
+
+  test.beforeEach(async () => {
+    const seed = await createSeedClient({ dryRun: false });
+    await seed.$resetDatabase();
+  });
+});
+```
+
+We can now set up our personas and test the specified behaviors:
+
+```ts
+  test("can login and logout as a user", async ({ page }, { testId }) => {
+    // Create the user we'll be login with
+    await createAndLoginUser(page, testId);
+    // Check that the user is logged in
+    await page.goto("/");
+    // We should see the logout button
+    const logoutButton = await page.waitForSelector(`text=${"Logout"}`);
+    // Logout
+    await logoutButton.click();
+    // Check that the user is logged out
+    expect(page.locator(`text=${"Logout"}`)).not.toBeVisible();
+  });
+
+  test("can write own tweets", async ({ page }, { testId }) => {
+    // Create the user we'll be login with
+    await createAndLoginUser(page, testId);
+    // Check that the user is logged in
+    await page.goto("/");
+    // We should now see our tweet in the page
+    expect(page.locator("p", { hasText: "Hello, World!" })).not.toBeVisible();
+    const tweetInput = await page.waitForSelector('input[name="title"]');
+    await tweetInput.fill("Hello, World!");
+    await tweetInput.press("Enter");
+    // Because playwright doesn't work with nextjs router.refresh, we need to reload the page
+    await page.reload();
+    // The tweet should now be visible without a refresh of the page with the realtime updates
+    await expect(page.locator("p", { hasText: "Hello, World!" })).toBeVisible();
+  });
+
+  test("can like existing tweets", async ({ page }, { testId }) => {
+    // Create the user we'll be login with
+    const userProfile = await createAndLoginUser(page, testId);
+    const seed = await createSeedClient({ dryRun: false });
+    // Create some tweets to like
+    await seed.tweets((x) => x(10), { connect: { profiles: [userProfile] } });
+    // Check that the user is logged in
+    await page.goto("/");
+
+    const firstTweet = await page.getByTestId("tweet-0");
+    // The tweet like button should be visible
+    const firstTweetLikeButton = await firstTweet.getByTestId("like-button");
+    const firstTweetUnlikeLikeButton =
+      await firstTweet.getByTestId("unlike-button");
+    expect(firstTweetLikeButton).toBeVisible();
+    expect(firstTweetUnlikeLikeButton).not.toBeVisible();
+    // Like the tweet
+    await firstTweetLikeButton.click();
+    // The like button should now be hidden
+    expect(firstTweetLikeButton).not.toBeVisible();
+    // The unlike button should now be visible
+    expect(firstTweetUnlikeLikeButton).toBeVisible();
+    // Everything should persist after a page reload
+    await page.reload();
+    expect(firstTweetLikeButton).not.toBeVisible();
+    expect(firstTweetUnlikeLikeButton).toBeVisible();
+  });
+  test("can unlike already liked tweet", async ({ page }, { testId }) => {
+    // Create the user we'll be login with
+    const userProfile = await createAndLoginUser(page, testId);
+    const seed = await createSeedClient({ dryRun: false });
+    // Create some tweets to like
+    await seed.tweets(
+      (x) =>
+        x(10, () => ({
+          // We make it so our user has liked the tweet
+          likes: [{ userId: userProfile.id }],
+        })),
+      { connect: { profiles: [userProfile] } }
+    );
+    // Check that the user is logged in
+    await page.goto("/");
+
+    const firstTweet = await page.getByTestId("tweet-0");
+    // The tweet unlike button should be visible
+    const firstTweetLikeButton = await firstTweet.getByTestId("like-button");
+    const firstTweetUnlikeLikeButton =
+      await firstTweet.getByTestId("unlike-button");
+    expect(firstTweetUnlikeLikeButton).toBeVisible();
+    expect(firstTweetLikeButton).not.toBeVisible();
+    // Unlike the tweet
+    await firstTweetUnlikeLikeButton.click();
+    // The the unlike button should now be hidden and the like button available
+    expect(firstTweetLikeButton).toBeVisible();
+    expect(firstTweetUnlikeLikeButton).not.toBeVisible();
+    // Everything should persist after a page reload
+    await page.reload();
+    expect(firstTweetLikeButton).toBeVisible();
+    expect(firstTweetUnlikeLikeButton).not.toBeVisible();
+  });
+```
+
+Snaplet ensures each test operates with a unique user and pre-established data conditions, facilitating a diverse range of scenario tests, such as users with or without liked tweets.
+
+To execute our tests and visually verify the outcomes, use the command:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=<url> NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx playwright test --ui
+```
+
+![e2e-test-run](https://github.com/snaplet/examples/assets/8771783/8618909a-cba6-4ae4-b5f9-024739c15430)
+
+### Conclusion
+
+This tutorial showcased the integration of Snaplet Seed for setting up a local development environment and creating personas for end-to-end testing within a Supabase and Next.js-based Twitter clone. We hope these insights will assist in your Supabase projects, making Snaplet Seed a valuable tool in your development arsenal.

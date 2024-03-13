@@ -41,7 +41,7 @@ export default function Likes({
     }
   };
   return (
-    <button onClick={() => handleLikes()} className="group flex items-center">
+    <button data-testid={tweet.user_has_liked_tweet ? 'unlike-button' : `like-button`} onClick={() => handleLikes()} className="group flex items-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
