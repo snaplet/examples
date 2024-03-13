@@ -30,20 +30,19 @@ const store = await seed.accounts([{
     {
       salt: '6f032f4972e526fe3c663906055ec429',
       hash: 'ef5473c56ed0986791440b7b76000646819007d4db0caee9ed63c9602b79ce50f37f0f3b3bcbdbd063bca8e17f947f2b58e28ca9194829d43e75d675a0801c49'
-    },  
+    },
   ],
-  boards: [
-    {
-      columns: [
-        {
-
-          items: [
-            {}
-          ]
-        },
-      ]
-    }
-  ]
+  boards: (x) => x(1, ({ index: boardIndex }) => ({
+    columns: [
+      {
+        items: [
+          {
+            board: (ctx) => ctx.connect(({ store }) => store.boards[boardIndex])
+          }
+        ]
+      },
+    ]
+  }))
 }])
 
 // JSON.stringify(console.log(store.columns[0]), undefined, 2)
