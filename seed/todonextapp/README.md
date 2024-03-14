@@ -1,5 +1,20 @@
 # Todo app Next.js
 
+## Summary
+
+- [Todo app Next.js](#todo-app-nextjs)
+  - [Summary](#summary)
+  - [Declarative Seeding with Snaplet seed](#declarative-seeding-with-snaplet-seed)
+    - [What's This All About?](#whats-this-all-about)
+    - [Our Approach](#our-approach)
+    - [Prerequisites](#prerequisites)
+    - [Getting Started](#getting-started)
+    - [Starting Simple:](#starting-simple)
+    - [Adapting to Changes:](#adapting-to-changes)
+    - [Introduce snaplet to E2E testing](#introduce-snaplet-to-e2e-testing)
+    - [Conclusion](#conclusion)
+    - [Acknowledgment](#acknowledgment)
+
 ## Declarative Seeding with Snaplet seed
 
 ### What's This All About?
@@ -93,7 +108,7 @@ await seed.todos(x => x(3))
 // Run it with: DRY=0 npx tsx seed.mts
 ```
 
-[![asciicast](https://asciinema.org/a/63LZrysbUuEbd8GSGQhbtXNrU.svg)](https://asciinema.org/a/63LZrysbUuEbd8GSGQhbtXNrU)
+![todonextapp-asciinema](https://github.com/snaplet/examples/assets/8771783/2048ee86-b01c-47e4-93ce-0e4803348243)
 
 To create our desired 20 todos, we modify the `snaplet.todo` line accordingly:
 

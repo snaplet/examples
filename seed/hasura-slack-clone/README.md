@@ -1,5 +1,20 @@
 # Hasura Slack Clone: Effortless Database Seeding with Snaplet seed
 
+## Summary
+
+- [Hasura Slack Clone: Effortless Database Seeding with Snaplet seed](#hasura-slack-clone-effortless-database-seeding-with-snaplet-seed)
+  - [Summary](#summary)
+    - [What's This All About?](#whats-this-all-about)
+    - [Our Approach](#our-approach)
+    - [Prerequisites](#prerequisites)
+    - [Getting Started](#getting-started)
+    - [Setting up Snaplet](#setting-up-snaplet)
+    - [Generating Data](#generating-data)
+    - [Understanding data connection](#understanding-data-connection)
+    - [Nitpicking for Realism](#nitpicking-for-realism)
+    - [Going Further](#going-further)
+    - [Conclusions](#conclusions)
+
 ### What's This All About?
 
 In today's fast-paced development world, efficiently seeding a complex database is crucial for rapid application development. `@snaplet/seed` offers a seamless solution, and in this post, we'll explore its powerful capabilities using a Hasura slack clone as a case study.
