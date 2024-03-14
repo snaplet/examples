@@ -1,5 +1,20 @@
 # Supabase + NextJS Twitter Clone: Local Development and E2E Testing with Snaplet Seed
 
+## Summary
+- [Supabase + NextJS Twitter Clone: Local Development and E2E Testing with Snaplet Seed](#supabase--nextjs-twitter-clone-local-development-and-e2e-testing-with-snaplet-seed)
+  - [Summary](#summary)
+  - [What's This All About?](#whats-this-all-about)
+  - [Our Approach](#our-approach)
+  - [Prerequisites](#prerequisites)
+  - [Getting Started](#getting-started)
+  - [Local Development with Supabase](#local-development-with-supabase)
+    - [Setup OAuth for Local Development](#setup-oauth-for-local-development)
+    - [Setup an Email+Password Login for Local Development](#setup-an-emailpassword-login-for-local-development)
+    - [Setup @snaplet/seed](#setup-snapletseed)
+    - [Snaplet Seed with E2E](#snaplet-seed-with-e2e)
+    - [Conclusion](#conclusion)
+    - [Acknowledgments](#acknowledgments)
+
 ## What's This All About?
 
 In this tutorial, we'll leverage the Supabase guide to [Build a Twitter Clone](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb?af=9qsk0a) and demonstrate how to use Snaplet Seed for efficient local development and testing. Snaplet Seed simplifies the process of developing and testing your application by providing a method to easily seed your local environment with data.
@@ -48,7 +63,7 @@ First, let's set up a local development environment for the Supabase Twitter clo
     npx supabase init
     ```
 
-    ![supabase-init](https://asciinema.org/a/d1B5ZcVDiHth3X7qodf3h4rZM.svg)
+![supabase-init-asciinema](https://github.com/snaplet/examples/assets/8771783/10f11bca-5dd5-42ac-b81a-b33d6016026e)
 
 2. Sync your local project with your Supabase project:
 
@@ -81,7 +96,7 @@ npx supabase migration repair --status applied
 
 This command aligns our current migration with the remote project, ensuring both are in sync.
 
-[![supabase-db-pull](https://asciinema.org/a/2FvlJxh6CH8eJciakpY3C2Bjy.svg)](https://asciinema.org/a/2FvlJxh6CH8eJciakpY3C2Bjy)
+![supabase-db-pull-asciinema](https://github.com/snaplet/examples/assets/8771783/007d3bd6-a3e8-4bb0-93a7-c1b1e37cbe45)
 
 With these steps completed, we're now ready to launch our local development environment:
 
@@ -210,7 +225,7 @@ However, we still need to create a new user with email and password. This is whe
 
 Firstly, initialize Snaplet for our project by running `snaplet setup` and follow the on-screen instructions, targeting our local development Supabase database (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`).
 
-[![snaplet-setup](https://asciinema.org/a/GQTPGHS0dnG7NZ0KqzJM7uWpq.svg)](https://asciinema.org/a/GQTPGHS0dnG7NZ0KqzJM7uWpq)
+![snaplet-setup-asciinema](https://github.com/snaplet/examples/assets/8771783/3ea211a7-d223-4868-8150-9467328336ea)
 
 This generates a `seed.mts` file as shown below:
 
@@ -336,6 +351,9 @@ This process creates a pool of 5 users with email and password logins, allowing 
 
 Combining all the steps, our `seed.mts` file becomes:
 
+<details>
+<summary>Click to show the full code</summary>
+
 ```ts
 import { createSeedClient, type profilesScalars } from '@snaplet/seed';
 import { createClient } from '@supabase/supabase-js'
@@ -399,11 +417,13 @@ await seed.tweets(x => x(10), {connect: { profiles }})
 console.log('Profiles created: ', profiles)
 ```
 
+</details>
+
 Re-run the seed script with the environment variables set to your local Supabase instance:
 
 `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> DRY=0 npx tsx seed.mts`:
 
-[![snaplet-seed-users-and-tweets](https://asciinema.org/a/sItlFhIlrQ8E4bQm7TlBgMIya.svg)](https://asciinema.org/a/sItlFhIlrQ8E4bQm7TlBgMIya)
+![snaplet-seed-users-and-tweets-asciinema](https://github.com/snaplet/examples/assets/8771783/db797322-d5f4-469b-8860-ca8d9f108943)
 
 Now, visiting the Supabase admin panel will reveal 5 new users and 10 new tweets in our database. Utilizing the app/auth/dev/login route allows us to log in as any of these users:
 
@@ -498,6 +518,9 @@ test.describe('Twitter Clone actions', () => {
 
 We can now set up our personas and test the specified behaviors:
 
+<details>
+<summary>Click to show the full code</summary>
+
 ```ts
   test("can login and logout as a user", async ({ page }, { testId }) => {
     // Create the user we'll be login with
@@ -590,6 +613,8 @@ We can now set up our personas and test the specified behaviors:
   });
 ```
 
+</details>
+
 Snaplet ensures each test operates with a unique user and pre-established data conditions, facilitating a diverse range of scenario tests, such as users with or without liked tweets.
 
 To execute our tests and visually verify the outcomes, use the command:
@@ -603,3 +628,7 @@ NEXT_PUBLIC_SUPABASE_URL=<url> NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx play
 ### Conclusion
 
 This tutorial showcased the integration of Snaplet Seed for setting up a local development environment and creating personas for end-to-end testing within a Supabase and Next.js-based Twitter clone. We hope these insights will assist in your Supabase projects, making Snaplet Seed a valuable tool in your development arsenal.
+
+### Acknowledgments
+
+I would like to thank Jon Meyers for his valuable course "Build a Twitter Clone with the Next.js App Router and Supabase," hosted on egghead.io. This article was inspired and informed by his work.
