@@ -223,11 +223,54 @@ However, we still need to create a new user with email and password. This is whe
 
 ### Setup @snaplet/seed
 
-Firstly, initialize Snaplet for our project by running `snaplet setup` and follow the on-screen instructions, targeting our local development Supabase database (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`).
+To set it up:
 
-![snaplet-setup-asciinema](https://github.com/snaplet/examples/assets/8771783/3ea211a7-d223-4868-8150-9467328336ea)
+```bash
+npx @snaplet/seed@latest init
+```
 
-This generates a `seed.mts` file as shown below:
+You will be asked to choose an "adapter" to connect to your local database,
+in this example we'll use "postgres-js".
+
+The cli will genrate a default `seed.config.ts` for you and prompt you at some point
+to edit it to provide an "adapter" allowing us to connect to the database.
+
+What we need to do here is two things:
+
+1. Configure the default adapter so it connect to our localhost database: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+2. Ensure our seed, won't be touching our supabase internal tables as we don't want to alter them. We'll exclude them using the `select` option in the config.
+
+So let's edit our `seed.config.ts` so it look like this:
+
+```ts
+import { defineConfig } from "@snaplet/seed/config";
+import { SeedPostgres } from "@snaplet/seed/adapter-postgres";
+import postgres from "postgres";
+
+export default defineConfig({
+  // We use our postgres-js adapter to connect to our local database
+  adapter: () =>
+    new SeedPostgres(
+      postgres("postgresql://postgres:postgres@127.0.0.1:54322/postgres")
+    ),
+  select: {
+    // We don't alter any extensions tables that might be owned by extensions
+    "*": false,
+    // We want to alter all the tables under public schema
+    "public*": true,
+    // We also want to alter some of the tables under the auth schema
+    "auth.users": true,
+    "auth.identities": true,
+    "auth.sessions": true,
+  }
+});
+```
+
+> Every time you alter your database schema or seed.config.ts
+> you can run `npx @snaplet/seed sync` to update your seed client.
+
+When saving this configuration, our cli watcher will detect that it's now able to connect
+and introspect our database, and will finish our client generation generating a `seed.mts` file:
 
 ```ts
 import { createSeedClient } from '@snaplet/seed';
@@ -242,41 +285,11 @@ await seed.$resetDatabase()
 
 // Create 3 records in the HttpResponses table
 await seed.HttpResponses(x => x(3))
-
-// Execute with: DRY=0 npx tsx seed.mts
 ```
-
-By default, Snaplet will pull all data from our database. For Supabase, we prefer to pull only specific schemas. Let's create a `snaplet.config.ts` file at the project root with the following configuration:
-
-```ts
-import { defineConfig } from 'snaplet';
-
-export default defineConfig({
-    select: {
-        $default: false,
-        auth: {
-            $default: false,
-            users: true,
-            identities: true,
-            sessions: true,
-        },
-        public: true,
-    }
-});
-```
-
-Regenerate the seed file with the new configuration to apply these settings.
 
 Now, let's edit our `seed.mts` file to generate some tweets:
 
 ```ts
-import { createSeedClient } from '@snaplet/seed';
-import { copycat } from '@snaplet/copycat';
-
-const seed = await createSeedClient({
-  dryRun: process.env.DRY !== '0',
-});
-
 await seed.$resetDatabase()
 
 // Generate 10 tweets
@@ -286,6 +299,8 @@ await seed.tweets(x => x(10))
 After running `DRY=0 npx tsx seed.mts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.mts`:
 
 ```ts
+import { faker } from '@snaplet/copycat';
+
 const seed = await createSeedClient({
   dryRun: process.env.DRY !== '0',
   models: {
@@ -302,6 +317,8 @@ await seed.$resetDatabase()
 // Generate 10 tweets with valid avatar URLs
 await seed.tweets(x => x(10))
 ```
+
+We can now re-run our script with `DRY=0 npx tsx seed.mts`.
 
 Refreshing our page should now display the seeded tweet data correctly.
 
