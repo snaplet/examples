@@ -72,9 +72,8 @@ Here's how `snaplet` operates:
 Setting it up is as simple as:
 
 ```bash
-npx @snaple/seedt@latest init 
+npx @snaplet/seedt@latest init 
 ```
-
 
 You will be asked to choose an "adapter" to connect to your local database,
 in this example we'll use "prisma".
@@ -83,17 +82,20 @@ The cli will genrate a default `seed.config.ts` for you and prompt you at some p
 to edit it to provide an "adapter" allowing us to connect to the database.
 
 In our case the edit will look like:
+
 ```ts
 import { SeedPrisma } from "@snaplet/seed/adapter-prisma";
 import { defineConfig } from "@snaplet/seed/config";
-// We import the prisma instance that we use in our code
-import { db } from "./utils/db";
+import { db } from "./utils/db"
 
 export default defineConfig({
   adapter: () => {
-    // And we pass this instance to our adapter
     return new SeedPrisma(db);
   },
+  // We don't want to seed or truncate the migrations table
+  select: {
+    'public._prisma_migrations': false,
+  }
 });
 ```
 
@@ -101,17 +103,23 @@ When saving this configuration, our cli watcher will detect that it's now able t
 and introspect our database, and will finish our client generation generating a `seed.mts` file:
 
 ```ts
-import { createSeedClient } from '@snaplet/seed';
+import { createSeedClient } from "@snaplet/seed";
 
-const seed = await createSeedClient();
+const seed = await createSeedClient({
+  // Optional, the data will be printed to the console instead of being persisted to the database
+  // except if the DRY environment variable is set to 0
+  dryRun: process.env.DRY != '0',
+});
 
-// Clears all existing data in the database, but keep the structure
-await seed.$resetDatabase()
+// Truncate all tables in the database
+await seed.$resetDatabase();
 
+// Seed the database with 10 todos
+await seed.todos((x) => x(10));
 
-// This will create 3 records in the todos table
-// it reads todos times(x) 3
-await seed.todos(x => x(3))
+// Learn more about the `seed` client by following our guide: https://docs.snaplet.dev/seed/getting-started
+
+process.exit();
 ```
 
 To create our desired 20 todos, we modify the `snaplet.todo` line accordingly:
@@ -125,7 +133,7 @@ await seed.todo((x) => x(20));
 Populating the database is then just a command away:
 
 ```bash
-npx tsx seed.mts
+DRY=0 npx tsx seed.mts
 ```
 
 And voila !
@@ -255,17 +263,8 @@ For development, we now want:
 With `snaplet`, our `seed.mts` changes to:
 
 ```ts
-import { createSeedClient } from "@snaplet/seed";
-
-// We use copycat to generate fake data deterministically
-// that's like a deterministic faker
 import { copycat } from "@snaplet/copycat";
-
-const seed = await createSeedClient();
-
-// Clears all existing data in the database, but keep the structure
-await seed.$resetDatabase();
-
+...
 // 1. We create our first 5 initials users
 const appPlan = await seed.users((x) => x(5));
 
@@ -292,7 +291,7 @@ await seed.todos(
 We can now seed our database with:
 
 ```bash
-npx tsx seed.mts
+DRY=0 npx tsx seed.mts
 ```
 
 This comprehensive approach saves us from maintaining a lengthy and complex seed script (the generated SQL is now 120 lines long), illustrating why at Snaplet, we advocate for a declarative, database-aware, and auto-filled methodology. It's about creating and maintaining a dynamic, production-like development environment with ease.
