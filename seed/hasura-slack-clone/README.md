@@ -109,6 +109,10 @@ export default defineConfig({
     new SeedPostgres(
       postgres("postgres://postgres:postgrespassword@0.0.0.0:5433/postgres")
     ),
+  alias: {
+    // We want inflections name on our fields see: https://docs.snaplet.dev/seed/core-concepts#inflection
+    inflection: true,
+  }
   select: {
     // We don't want to alter any tables under this schema
     "hdb_catalog*": false,

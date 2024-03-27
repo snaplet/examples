@@ -92,6 +92,10 @@ export default defineConfig({
   adapter: () => {
     return new SeedPrisma(db);
   },
+  alias: {
+    // We want inflections name on our fields see: https://docs.snaplet.dev/seed/core-concepts#inflection
+    inflection: true,
+  }
   // We don't want to seed or truncate the migrations table
   select: {
     'public._prisma_migrations': false,
