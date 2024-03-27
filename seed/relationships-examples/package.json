@@ -14,7 +14,6 @@
     "prisma": "^5.11.0"
   },
   "devDependencies": {
-    "@snaplet/copycat": "^5.0.0",
-    "@snaplet/seed": "^0.90.0-alpha-5c7b9a4"
+    "@snaplet/copycat": "^5.0.0"
   }
 }
