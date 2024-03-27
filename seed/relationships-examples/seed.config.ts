@@ -11,6 +11,6 @@ export default defineConfig({
     _prisma_migrations: false,
   },
   alias: {
-    override: {}
+    inflection: false,
   }
 });
