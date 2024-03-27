@@ -276,9 +276,7 @@ and introspect our database, and will finish our client generation generating a 
 import { createSeedClient } from '@snaplet/seed';
 import { copycat } from '@snaplet/copycat';
 
-const seed = await createSeedClient({
-  dryRun: process.env.DRY !== '0',
-});
+const seed = await createSeedClient();
 
 // Reset the database, keeping the structure intact
 await seed.$resetDatabase()
@@ -296,13 +294,12 @@ await seed.$resetDatabase()
 await seed.tweets(x => x(10))
 ```
 
-After running `DRY=0 npx tsx seed.mts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.mts`:
+After running `npx tsx seed.mts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.mts`:
 
 ```ts
 import { faker } from '@snaplet/copycat';
 
 const seed = await createSeedClient({
-  dryRun: process.env.DRY !== '0',
   models: {
     profiles: {
       data: {
@@ -318,7 +315,7 @@ await seed.$resetDatabase()
 await seed.tweets(x => x(10))
 ```
 
-We can now re-run our script with `DRY=0 npx tsx seed.mts`.
+We can now re-run our script with `npx tsx seed.mts`.
 
 Refreshing our page should now display the seeded tweet data correctly.
 
@@ -379,7 +376,6 @@ import { copycat, faker } from '@snaplet/copycat'
 
 
 const seed = await createSeedClient({
-  dryRun: process.env.DRY !== '0',
   models: {
     profiles: {
       data: {
@@ -438,7 +434,7 @@ console.log('Profiles created: ', profiles)
 
 Re-run the seed script with the environment variables set to your local Supabase instance:
 
-`NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> DRY=0 npx tsx seed.mts`:
+`NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx tsx seed.mts`:
 
 ![snaplet-seed-users-and-tweets-asciinema](https://github.com/snaplet/examples/assets/8771783/db797322-d5f4-469b-8860-ca8d9f108943)
 

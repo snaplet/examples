@@ -122,11 +122,7 @@ and introspect our database, and will finish our client generation generating a 
 ```ts
 import { createSeedClient } from "@snaplet/seed";
 
-const seed = await createSeedClient({
-  // Optional, the data will be printed to the console instead of being persisted to the database
-  // except if the DRY environment variable is set to 0
-  dryRun: process.env.DRY != '0',
-});
+const seed = await createSeedClient();
 
 // Clears all existing data in the database, but keep the structure
 await seed.$resetDatabase();
@@ -143,7 +139,7 @@ process.exit()
 Now that we have our `seed.mts` file, we can generate data with the following command:
 
 ```bash
-DRY=0 npx tsx seed.mts
+npx tsx seed.mts
 ```
 
 With our current configuration this will create 3 workspace user types. Not very useful.
@@ -195,7 +191,7 @@ Based on our configuration, here's what we expect:
 Let's generate the data and explore the result:
 
 ```bash
-DRY=0 npx tsx seed.mts
+npx tsx seed.mts
 ```
 
 As you can see, we have now a lot of data in our database. Let's explore it in the Hasura console.
@@ -279,7 +275,7 @@ await seed.workspaces(
 After adjusting our data generation strategy, let's run the command again to see the results:
 
 ```bash
-DRY=0 npx tsx seed.mts
+npx tsx seed.mts
 ```
 
 ![snaplet-generate-image-gif](https://github.com/snaplet/examples/assets/8771783/7f466678-6db8-4046-9cb1-8638228e8fce)

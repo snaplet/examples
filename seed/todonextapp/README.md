@@ -105,11 +105,7 @@ and introspect our database, and will finish our client generation generating a 
 ```ts
 import { createSeedClient } from "@snaplet/seed";
 
-const seed = await createSeedClient({
-  // Optional, the data will be printed to the console instead of being persisted to the database
-  // except if the DRY environment variable is set to 0
-  dryRun: process.env.DRY != '0',
-});
+const seed = await createSeedClient();
 
 // Truncate all tables in the database
 await seed.$resetDatabase();
@@ -133,14 +129,19 @@ await seed.todo((x) => x(20));
 Populating the database is then just a command away:
 
 ```bash
-DRY=0 npx tsx seed.mts
+npx tsx seed.mts
 ```
 
 And voila !
 
 ![todolist](https://github.com/avallete/todonextjs/assets/8771783/e1ecf3b9-7cd8-41c2-a7e4-84c36c1f5fbc)
 
-Running `DRY=1 npx tsx seed.mts` reveals the underlying SQL queries, showcasing the simplicity and power of `@snaplet/seed`:
+Running adding the dry run true option to the seed client creation allows us to reveals the underlying SQL queries showcasing the simplicity and power of `@snaplet/seed`:
+
+```ts
+...
+const seed = await createSeedClient({ dryRun: true });
+```
 
 ```sql
 INSERT INTO
@@ -291,7 +292,7 @@ await seed.todos(
 We can now seed our database with:
 
 ```bash
-DRY=0 npx tsx seed.mts
+npx tsx seed.mts
 ```
 
 This comprehensive approach saves us from maintaining a lengthy and complex seed script (the generated SQL is now 120 lines long), illustrating why at Snaplet, we advocate for a declarative, database-aware, and auto-filled methodology. It's about creating and maintaining a dynamic, production-like development environment with ease.
