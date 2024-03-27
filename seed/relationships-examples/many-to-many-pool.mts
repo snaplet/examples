@@ -5,6 +5,9 @@ const seed = await createSeedClient();
 // Truncate all tables
 await seed.$resetDatabase();
 
+// First, we create a pool of 5 tags to associate with posts
+const { Tag } = await seed.Tag((x) => x(5))
+
 // We create 5 users
 await seed.User(
     (x) => x(5, ({
@@ -15,4 +18,8 @@ await seed.User(
             PostTags: (x) => x({min: 0, max: 3})
         })
     )})
-))
+),
+{
+    // We provide our pool of tags for the PostTags relationship to choose from
+    connect: { Tag }
+})

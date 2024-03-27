@@ -1,10 +1,10 @@
 # Utilizing @snaplet/seed with Relationships
 
-This guide illustrates how to employ @snaplet/seed for implementing common relationship patterns, specifically focusing on one-to-many and many-to-many relationships. It aims to streamline the process of managing and interconnecting data.
+This guide demonstrates how to use @snaplet/seed to implement common relationship patterns, focusing particularly on one-to-many and many-to-many relationships. Its goal is to simplify the management and interconnection of data.
 
 ## Getting Started
 
-Execute the following commands to clone the example repository, install dependencies, migrate your database, and sync your seed data:
+To begin, execute the following commands to clone the example repository, install dependencies, migrate your database, and initialize your seed data:
 
 ```bash
 git clone git@github.com:snaplet/examples.git && cd examples/seed/relationships-examples
@@ -15,14 +15,14 @@ npx @snaplet/seed init
 
 ## Database Structure
 
-Within this example, our `schema.prisma` file defines the database structure, showcasing models that represent a one-to-many relationship and a many-to-many relationship. We'll construct a simplistic blog system where:
+In this example, the `schema.prisma` file outlines the database structure, illustrating models that depict a one-to-many relationship and a many-to-many relationship. We aim to create a basic blog system where:
 
-- A User can create multiple Posts (illustrating a one-to-many relationship).
-- A Post can be tagged with multiple Tags, and a Tag can be associated with multiple Posts (demonstrating a many-to-many relationship via the PostTags table).
+- A User can create multiple Posts, illustrating a one-to-many relationship.
+- A Post can be associated with multiple Tags, and a Tag can be linked to multiple Posts, showcasing a many-to-many relationship through the PostTags table.
 
 ### One-to-Many Relationship
 
-Suppose we aim to create 5 new users, each with a varying number of posts ranging from 0 to 5. The following snippet illustrates how to define this one-to-many relationship in our seed file:
+Let's say our goal is to generate 5 new users, each with a variable number of posts ranging from 0 to 5. The code snippet below demonstrates how to define this one-to-many relationship in our seed file:
 
 ```one-to-many.ts
 import { createSeedClient } from "@snaplet/seed";
@@ -33,7 +33,7 @@ const seed = await createSeedClient();
 await seed.$resetDatabase();
 
 // Create 5 users, each potentially having up to 5 posts
-// Posts at this stage do not have associated tags
+// At this stage, posts do not have associated tags
 await seed.User((x) => x(5, {
     Post: (x) => x({min: 0, max: 5})
 }))
@@ -41,7 +41,7 @@ await seed.User((x) => x(5, {
 
 ### Many-to-Many Relationship
 
-A many-to-many relationship through a join table is another typical pattern. In our case, Posts and Tags have a many-to-many relationship. We aim for each user's posts to have between 0 and 3 associated tags:
+A many-to-many relationship facilitated by a join table is another common pattern. Here, Posts and Tags are interrelated in such a manner. Our aim is for each user's posts to be linked to between 0 and 3 tags:
 
 ```many-to-many.ts
 import { createSeedClient } from "@snaplet/seed";
@@ -51,29 +51,54 @@ const seed = await createSeedClient();
 // Clear all tables
 await seed.$resetDatabase();
 
-// Initially, create a pool of 5 tags for post association
-const { Tag } = await seed.Tag((x) => x(5))
-
-// Create 5 users
+// Create 5 users, each potentially having up to 5 posts
 await seed.User(
-    (x) => x(5, {
-    // Each can have up to 5 posts
+    (x) => x(5, ({
     Post: (x) => x({min: 0, max: 5},
         () => ({
-            // Each post can be associated with up to 3 tags
+            // Each post can have between 0 and 3 tags associated with it
             PostTags: (x) => x({min: 0, max: 3})
         })
-    )}),
-    {
-    // Link the posts to the pre-created tags
-    connect: { Tag }
-})
+    )})
+))
 ```
 
-By running the below SQL query, you can verify that the posts are linked with the tags as intended:
+To ensure that posts are associated with tags as expected, run the following SQL query:
 
 ```sql
 SELECT postId, COUNT(DISTINCT tagId)
 FROM PostTags
 GROUP BY postId
 ```
+
+However, an issue arises in our database: each `PostTags` association corresponds to a unique `Tag` entity, meaning no two `PostTags` associations share the same `Tag` entity. This is not the desired outcome, as it results from `PostTags` creating a new `Tag` entity for each association rather than utilizing existing ones.
+
+To address this, we can introduce a "pool" method, allowing `PostTags` to link each post with tags from our predefined pool instead of generating new ones for each association. Here's how we can adjust our script accordingly:
+
+```many-to-many-pool.ts
+import { createSeedClient } from "@snaplet/seed";
+
+const seed = await createSeedClient();
+
+// Clear all tables
+await seed.$resetDatabase();
+
+// Initially, create a pool of 5 tags for post associations
+const { Tag } = await seed.Tag((x) => x(5))
+
+// Create 5 users
+await seed.User(
+    (x) => x(5, ({
+    Post: (x) => x({min: 0, max: 5},
+        () => ({
+            // Each post can have between 0 and 3 tags associated with it
+            PostTags: (x) => x({min: 0, max: 3})
+        })
+    )}),
+    {
+    // Provide the pool of tags for the PostTags relationship to select from
+    connect: { Tag }
+})
+```
+
+Now, we achieve a more realistic data representation, with 30 tag associations across our posts, yet only 5 unique tags are used.
