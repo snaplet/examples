@@ -1,0 +1,31 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  email String [unique, not null]
+  members Member [not null]
+}
+
+Table Member {
+  id Int [pk, increment]
+  organizationId Int [not null]
+  userId Int [not null]
+  role String [not null]
+  user User [not null]
+  organization Organization [not null]
+
+  indexes {
+    (organizationId, userId) [unique]
+  }
+}
+
+Table Organization {
+  id Int [pk, increment]
+  members Member [not null]
+}
+
+Ref: Member.userId > User.id
+
+Ref: Member.organizationId > Organization.id

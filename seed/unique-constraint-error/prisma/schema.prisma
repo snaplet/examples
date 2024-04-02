@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+
+  members Member[]
+}
+
+model Member {
+  id              Int          @id @default(autoincrement())
+  organizationId  Int
+  userId          Int
+  role            String
+
+  user          User         @relation(fields: [userId], references: [id])
+  organization  Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, userId])
+}
+
+model Organization {
+  id      Int      @id @default(autoincrement())
+  members Member[]
+}
