@@ -10,10 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.11.0",
-    "prisma": "^5.11.0"
+    "@prisma/client": "^5.11.0"
   },
   "devDependencies": {
-    "@snaplet/copycat": "^5.0.0"
+    "@snaplet/copycat": "^5.0.0",
+    "prisma": "^5.11.0",
+    "prisma-dbml-generator": "^0.12.0"
   }
 }
