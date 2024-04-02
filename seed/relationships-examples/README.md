@@ -24,7 +24,8 @@ In this example, the `schema.prisma` file outlines the database structure, illus
 
 Let's say our goal is to generate 5 new users, each with a variable number of posts ranging from 0 to 5. The code snippet below demonstrates how to define this one-to-many relationship in our seed file:
 
-```one-to-many.ts
+```typescript
+
 import { createSeedClient } from "@snaplet/seed";
 
 const seed = await createSeedClient();
@@ -39,11 +40,12 @@ await seed.User((x) => x(5, {
 }))
 ```
 
+
 ### Many-to-Many Relationship
 
 A many-to-many relationship facilitated by a join table is another common pattern. Here, Posts and Tags are interrelated in such a manner. Our aim is for each user's posts to be linked to between 0 and 3 tags:
 
-```many-to-many.ts
+```typescript
 import { createSeedClient } from "@snaplet/seed";
 
 const seed = await createSeedClient();
@@ -75,7 +77,7 @@ However, an issue arises in our database: each `PostTags` association correspond
 
 To address this, we can introduce a "pool" method, allowing `PostTags` to link each post with tags from our predefined pool instead of generating new ones for each association. Here's how we can adjust our script accordingly:
 
-```many-to-many-pool.ts
+```typescript
 import { createSeedClient } from "@snaplet/seed";
 
 const seed = await createSeedClient();
