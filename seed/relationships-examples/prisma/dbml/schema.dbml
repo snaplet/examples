@@ -1,0 +1,41 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  name String [not null]
+  posts Post [not null]
+}
+
+Table Post {
+  id Int [pk, increment]
+  title String [not null]
+  content String [not null]
+  userId Int [not null]
+  user User [not null]
+  PostTags PostTags [not null]
+}
+
+Table Tag {
+  id Int [pk, increment]
+  name String [not null]
+  PostTags PostTags [not null]
+}
+
+Table PostTags {
+  postId Int [not null]
+  tagId Int [not null]
+  tag Tag [not null]
+  post Post [not null]
+
+  indexes {
+    (postId, tagId) [pk]
+  }
+}
+
+Ref: Post.userId > User.id
+
+Ref: PostTags.tagId > Tag.id
+
+Ref: PostTags.postId > Post.id
