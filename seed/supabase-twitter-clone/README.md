@@ -257,16 +257,16 @@ export default defineConfig({
     // We want inflections name on our fields see: https://docs.snaplet.dev/seed/core-concepts#inflection
     inflection: true,
   }
-  select: {
+  select: [
     // We don't alter any extensions tables that might be owned by extensions
-    "*": false,
+    "!*", 
     // We want to alter all the tables under public schema
-    "public*": true,
+    "public*",
     // We also want to alter some of the tables under the auth schema
-    "auth.users": true,
-    "auth.identities": true,
-    "auth.sessions": true,
-  }
+    "auth.users",
+    "auth.identities",
+    "auth.sessions",
+  ]
 });
 ```
 

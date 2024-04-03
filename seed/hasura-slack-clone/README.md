@@ -113,10 +113,10 @@ export default defineConfig({
     // We want inflections name on our fields see: https://docs.snaplet.dev/seed/core-concepts#inflection
     inflection: true,
   }
-  select: {
+  select: [
     // We don't want to alter any tables under this schema
-    "hdb_catalog*": false,
-  },
+    "!hdb_catalog*",
+  ],
 });
 ```
 

@@ -7,9 +7,9 @@ export default defineConfig({
     const client = new PrismaClient();
     return new SeedPrisma(client);
   },
-  select: {
-    _prisma_migrations: false,
-  },
+  select: [
+    "!_prisma_migrations",
+  ],
   alias: {
     inflection: false,
   }

@@ -97,9 +97,9 @@ export default defineConfig({
     inflection: true,
   }
   // We don't want to seed or truncate the migrations table
-  select: {
-    'public._prisma_migrations': false,
-  }
+  select: [
+    '!public._prisma_migrations',
+  ]
 });
 ```
 
