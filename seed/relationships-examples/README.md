@@ -20,6 +20,8 @@ In this example, the `schema.prisma` file outlines the database structure, illus
 - A User can create multiple Posts, illustrating a one-to-many relationship.
 - A Post can be associated with multiple Tags, and a Tag can be linked to multiple Posts, showcasing a many-to-many relationship through the PostTags table.
 
+![relationship-diagram](./relationships-diagram.svg)
+
 ### One-to-Many Relationship
 
 Let's say our goal is to generate 5 new users, each with a variable number of posts ranging from 0 to 5. The code snippet below demonstrates how to define this one-to-many relationship in our seed file:
