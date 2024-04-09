@@ -328,6 +328,7 @@ To easily log in as the creators of these tweets, we integrate the Supabase SDK 
 ```ts
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation 
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
