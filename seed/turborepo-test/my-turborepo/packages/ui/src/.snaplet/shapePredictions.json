@@ -1,0 +1,90 @@
+[
+  {
+    "schemaName": "public",
+    "tableName": "Post",
+    "predictions": [
+      {
+        "input": "public post content",
+        "column": "content",
+        "shape": "POST_BODY",
+        "confidence": 0.7429391145706177,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public post title",
+        "column": "title",
+        "shape": "POST_TITLE",
+        "confidence": 0.5458157062530518,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "Tag",
+    "predictions": [
+      {
+        "input": "public tag name",
+        "column": "name",
+        "shape": "COMMERCE_PRODUCT_NAME",
+        "confidence": 0.9616398811340332,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "User",
+    "predictions": [
+      {
+        "input": "public user name",
+        "column": "name",
+        "shape": "USERNAME",
+        "confidence": 0.9706624150276184,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "_prisma_migrations",
+    "predictions": [
+      {
+        "input": "public prisma_migrations checksum",
+        "column": "checksum",
+        "shape": "CHECKSUM",
+        "confidence": 0.9797677397727966,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public prisma_migrations id",
+        "column": "id",
+        "shape": "UUID",
+        "confidence": 0.9955798983573914,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public prisma_migrations logs",
+        "column": "logs",
+        "shape": "LOGS",
+        "confidence": 0.9948318004608154,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public prisma_migrations migration_name",
+        "column": "migration_name",
+        "shape": "SYSTEM_FILE_NAME",
+        "confidence": 0.9866090416908264,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]

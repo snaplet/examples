@@ -104,7 +104,7 @@ export default defineConfig({
 ```
 
 When saving this configuration, our cli watcher will detect that it's now able to connect
-and introspect our database, and will finish our client generation generating a `seed.mts` file:
+and introspect our database, and will finish our client generation generating a `seed.ts` file:
 
 ```ts
 import { createSeedClient } from "@snaplet/seed";
@@ -133,7 +133,7 @@ await seed.todo((x) => x(20));
 Populating the database is then just a command away:
 
 ```bash
-npx tsx seed.mts
+npx tsx seed.ts
 ```
 
 And voila !
@@ -265,7 +265,7 @@ For development, we now want:
 2. Twenty todos created by these users.
 3. Five votes per todo.
 
-With `snaplet`, our `seed.mts` changes to:
+With `snaplet`, our `seed.ts` changes to:
 
 ```ts
 import { copycat } from "@snaplet/copycat";
@@ -296,7 +296,7 @@ await seed.todos(
 We can now seed our database with:
 
 ```bash
-npx tsx seed.mts
+npx tsx seed.ts
 ```
 
 This comprehensive approach saves us from maintaining a lengthy and complex seed script (the generated SQL is now 120 lines long), illustrating why at Snaplet, we advocate for a declarative, database-aware, and auto-filled methodology. It's about creating and maintaining a dynamic, production-like development environment with ease.
