@@ -274,7 +274,7 @@ export default defineConfig({
 > you can run `npx @snaplet/seed sync` to update your seed client.
 
 When saving this configuration, our cli watcher will detect that it's now able to connect
-and introspect our database, and will finish our client generation generating a `seed.mts` file:
+and introspect our database, and will finish our client generation generating a `seed.ts` file:
 
 ```ts
 import { createSeedClient } from '@snaplet/seed';
@@ -289,7 +289,7 @@ await seed.$resetDatabase()
 await seed.HttpResponses(x => x(3))
 ```
 
-Now, let's edit our `seed.mts` file to generate some tweets:
+Now, let's edit our `seed.ts` file to generate some tweets:
 
 ```ts
 await seed.$resetDatabase()
@@ -298,7 +298,7 @@ await seed.$resetDatabase()
 await seed.tweets(x => x(10))
 ```
 
-After running `npx tsx seed.mts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.mts`:
+After running `npx tsx seed.ts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.ts`:
 
 ```ts
 import { faker } from '@snaplet/copycat';
@@ -319,7 +319,7 @@ await seed.$resetDatabase()
 await seed.tweets(x => x(10))
 ```
 
-We can now re-run our script with `npx tsx seed.mts`.
+We can now re-run our script with `npx tsx seed.ts`.
 
 Refreshing our page should now display the seeded tweet data correctly.
 
@@ -368,7 +368,7 @@ console.log("Profiles created: ", profiles);
 
 This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator.
 
-Combining all the steps, our `seed.mts` file becomes:
+Combining all the steps, our `seed.ts` file becomes:
 
 <details>
 <summary>Click to show the full code</summary>
@@ -439,7 +439,7 @@ console.log('Profiles created: ', profiles)
 
 Re-run the seed script with the environment variables set to your local Supabase instance:
 
-`NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx tsx seed.mts`:
+`NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx tsx seed.ts`:
 
 ![snaplet-seed-users-and-tweets-asciinema](https://github.com/snaplet/examples/assets/8771783/db797322-d5f4-469b-8860-ca8d9f108943)
 

@@ -76,7 +76,7 @@ Snaplet operates in two main steps:
 
 1. **Introspection:** Snaplet analyzes your database, gathering schema, data, and relationship details.
 2. **Configuration:** Snaplet generates multiples transforms to generate data based on the introspection result (columns names, data types, relationships, etc).
-3. **Script Generation:** Snaplet generates a `seed.mts` file for data generation.
+3. **Script Generation:** Snaplet generates a `seed.ts` file for data generation.
 
 To set it up:
 
@@ -121,7 +121,7 @@ export default defineConfig({
 ```
 
 When saving this configuration, our cli watcher will detect that it's now able to connect
-and introspect our database, and will finish our client generation generating a `seed.mts` file:
+and introspect our database, and will finish our client generation generating a `seed.ts` file:
 
 ```ts
 import { createSeedClient } from "@snaplet/seed";
@@ -140,10 +140,10 @@ process.exit()
 
 ### Generating Data
 
-Now that we have our `seed.mts` file, we can generate data with the following command:
+Now that we have our `seed.ts` file, we can generate data with the following command:
 
 ```bash
-npx tsx seed.mts
+npx tsx seed.ts
 ```
 
 With our current configuration this will create 3 workspace user types. Not very useful.
@@ -157,7 +157,7 @@ To build a more realistic environment, we plan to add:
 
 These additions will help us simulate a more authentic workspace environment, giving us a better platform to demonstrate the capabilities of `@snaplet/seed`.
 
-We can update our `seed.mts` like this:
+We can update our `seed.ts` like this:
 
 ```ts
 ...
@@ -195,7 +195,7 @@ Based on our configuration, here's what we expect:
 Let's generate the data and explore the result:
 
 ```bash
-npx tsx seed.mts
+npx tsx seed.ts
 ```
 
 As you can see, we have now a lot of data in our database. Let's explore it in the Hasura console.
@@ -279,7 +279,7 @@ await seed.workspaces(
 After adjusting our data generation strategy, let's run the command again to see the results:
 
 ```bash
-npx tsx seed.mts
+npx tsx seed.ts
 ```
 
 ![snaplet-generate-image-gif](https://github.com/snaplet/examples/assets/8771783/7f466678-6db8-4046-9cb1-8638228e8fce)
