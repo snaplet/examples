@@ -1,0 +1,16 @@
+[
+  {
+    "schemaName": "",
+    "tableName": "Tag",
+    "predictions": [
+      {
+        "input": " tag name",
+        "column": "name",
+        "shape": "PERSON_ZODIAC_SIGN",
+        "confidence": 0.2977316081523895,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]

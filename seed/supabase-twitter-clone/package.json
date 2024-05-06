@@ -25,6 +25,7 @@
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "typescript": "^5",
-    "postgres": "^3.4.4"
+    "postgres": "^3.4.4",
+    "@snaplet/seed": "file://Users/avallete/Documents/Programming/Snaplet/seed/packages/seed/snaplet-seed-0.93.0.tgz"
   }
 }

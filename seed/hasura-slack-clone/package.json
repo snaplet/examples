@@ -13,6 +13,10 @@
     "dotenv-cli": "^7.3.0",
     "hasura-cli": "^2.35.1",
     "postgres": "^3.4.4",
+    "prisma": "^5.13.0",
     "tsx": "^4.6.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.13.0"
   }
 }

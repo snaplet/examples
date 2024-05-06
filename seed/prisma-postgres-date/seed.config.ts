@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 export default defineConfig({
   adapter: () => {
-    const client = new PrismaClient(/* connection parameters */);
+    const client = new PrismaClient();
     return new SeedPrisma(client);
   },
   select: ["!*_prisma_migrations"],

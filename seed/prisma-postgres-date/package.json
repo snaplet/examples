@@ -14,8 +14,8 @@
   },
   "devDependencies": {
     "@snaplet/copycat": "^5.0.0",
-    "@snaplet/seed": "^0.95.0-alpha-beab0c3",
-    "prisma": "^5.11.0",
-    "prisma-dbml-generator": "^0.12.0"
+    "@snaplet/seed": "file://Users/avallete/Documents/Programming/Snaplet/seed/packages/seed/snaplet-seed-0.97.8.tgz",
+    "@types/node": "^20.12.7",
+    "prisma": "^5.11.0"
   }
 }

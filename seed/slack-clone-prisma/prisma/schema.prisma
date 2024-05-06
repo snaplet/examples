@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model channel {
+  id             String           @id(map: "channels_pkey") @db.Uuid
+  name           String
+  is_public      Boolean
+  workspace_id   String           @db.Uuid
+  created_at     DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime         @default(now()) @db.Timestamptz(6)
+  created_by     String           @db.Uuid
+  workspace      workspace        @relation(fields: [workspace_id], references: [id], onUpdate: Restrict, map: "channels_workspace_id_fkey")
+  channel_member channel_member[]
+  channel_thread channel_thread[]
+}
+
+model channel_member {
+  id         String   @id @db.Uuid
+  channel_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  channel    channel  @relation(fields: [channel_id], references: [id], onUpdate: Restrict)
+  users      users    @relation(fields: [user_id], references: [id], onUpdate: Restrict)
+}
+
+model channel_thread {
+  id                     String                   @id @db.Uuid
+  channel_id             String                   @db.Uuid
+  created_at             DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime                 @default(now()) @db.Timestamptz(6)
+  channel                channel                  @relation(fields: [channel_id], references: [id], onUpdate: Restrict)
+  channel_thread_message channel_thread_message[]
+}
+
+model channel_thread_message {
+  id                String         @id @db.Uuid
+  user_id           String         @db.Uuid
+  channel_thread_id String         @db.Uuid
+  message           String
+  created_at        DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime       @default(now()) @db.Timestamptz(6)
+  channel_thread    channel_thread @relation(fields: [channel_thread_id], references: [id], onUpdate: Restrict)
+  users             users          @relation(fields: [user_id], references: [id], onUpdate: Restrict)
+}
+
+model user_message {
+  id                                     String    @id @db.Uuid
+  user_id                                String    @db.Uuid
+  recipient_id                           String    @db.Uuid
+  message                                String
+  created_at                             DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                             DateTime  @default(now()) @db.Timestamptz(6)
+  workspace_id                           String    @db.Uuid
+  users_user_message_recipient_idTousers users     @relation("user_message_recipient_idTousers", fields: [recipient_id], references: [id], onUpdate: Restrict)
+  users_user_message_user_idTousers      users     @relation("user_message_user_idTousers", fields: [user_id], references: [id], onUpdate: Restrict)
+  workspace                              workspace @relation(fields: [workspace_id], references: [id], onUpdate: Restrict)
+}
+
+model users {
+  id                                            String                   @id @default(dbgenerated("public.gen_random_uuid()")) @db.Uuid
+  name                                          String
+  email                                         String
+  display_name                                  String?
+  bio                                           String?
+  phone_number                                  String?
+  timezone                                      String?
+  created_at                                    DateTime                 @default(now()) @db.Timestamptz(6)
+  updated_at                                    DateTime                 @default(now()) @db.Timestamptz(6)
+  last_seen                                     DateTime?                @db.Timestamptz(6)
+  password                                      String
+  channel_member                                channel_member[]
+  channel_thread_message                        channel_thread_message[]
+  user_message_user_message_recipient_idTousers user_message[]           @relation("user_message_recipient_idTousers")
+  user_message_user_message_user_idTousers      user_message[]           @relation("user_message_user_idTousers")
+  workspace                                     workspace[]
+  workspace_member                              workspace_member[]
+}
+
+model workspace {
+  id               String             @id @db.Uuid
+  name             String             @unique
+  owner_id         String             @db.Uuid
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  url_slug         String             @unique
+  channel          channel[]
+  user_message     user_message[]
+  users            users              @relation(fields: [owner_id], references: [id], onUpdate: Restrict, map: "workspace_owner_fkey")
+  workspace_member workspace_member[]
+}
+
+model workspace_member {
+  user_id             String              @db.Uuid
+  workspace_id        String              @db.Uuid
+  created_at          DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime            @default(now()) @db.Timestamptz(6)
+  type                String              @default("member")
+  workspace_user_type workspace_user_type @relation(fields: [type], references: [type], onUpdate: Restrict)
+  users               users               @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "workspace_members_user_id_fkey")
+  workspace           workspace           @relation(fields: [workspace_id], references: [id], onUpdate: Restrict, map: "workspace_members_workspace_id_fkey")
+
+  @@id([user_id, workspace_id], map: "workspace_members_pkey")
+}
+
+model workspace_user_type {
+  type             String             @id(map: "user_type_pkey")
+  workspace_member workspace_member[]
+}

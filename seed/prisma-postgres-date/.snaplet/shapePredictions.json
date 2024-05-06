@@ -1,0 +1,24 @@
+[
+  {
+    "schemaName": "dev",
+    "tableName": "User",
+    "predictions": [
+      {
+        "input": "dev user first_name",
+        "column": "firstName",
+        "shape": "PERSON_FIRST_NAME",
+        "confidence": 0.997188150882721,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "dev user last_name",
+        "column": "lastName",
+        "shape": "PERSON_LAST_NAME",
+        "confidence": 0.9968782663345337,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]
