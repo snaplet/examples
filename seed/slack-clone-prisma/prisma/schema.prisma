@@ -64,7 +64,7 @@ model user_message {
 }
 
 model users {
-  id                                            String                   @id @default(dbgenerated("public.gen_random_uuid()")) @db.Uuid
+  id                                            String                   @id @db.Uuid
   name                                          String
   email                                         String
   display_name                                  String?

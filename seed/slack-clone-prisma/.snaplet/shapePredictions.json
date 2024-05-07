@@ -1,0 +1,142 @@
+[
+  {
+    "schemaName": "public",
+    "tableName": "channel",
+    "predictions": [
+      {
+        "input": "public channel name",
+        "column": "name",
+        "shape": "INTERNET_DOMAIN_NAME",
+        "confidence": 0.2486281394958496,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "channel_thread_message",
+    "predictions": [
+      {
+        "input": "public channel_thread_message message",
+        "column": "message",
+        "shape": "POST_BODY",
+        "confidence": 0.4753102958202362,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "user_message",
+    "predictions": [
+      {
+        "input": "public user_message message",
+        "column": "message",
+        "shape": "MESSAGE",
+        "confidence": 0.2444946616888046,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "users",
+    "predictions": [
+      {
+        "input": "public users bio",
+        "column": "bio",
+        "shape": "PERSON_BIO",
+        "confidence": 1,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public users display_name",
+        "column": "display_name",
+        "shape": "INTERNET_DISPLAY_NAME",
+        "confidence": 0.8810674548149109,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public users email",
+        "column": "email",
+        "shape": "EMAIL",
+        "confidence": 0.9942367076873779,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public users name",
+        "column": "name",
+        "shape": "USERNAME",
+        "confidence": 0.8959667682647705,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public users password",
+        "column": "password",
+        "shape": "PASSWORD",
+        "confidence": 0.9364579916000366,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public users phone_number",
+        "column": "phone_number",
+        "shape": "PHONE_NUMBER",
+        "confidence": 0.9904338121414185,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public users timezone",
+        "column": "timezone",
+        "shape": "TIMEZONE",
+        "confidence": 0.9690155982971191,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "workspace",
+    "predictions": [
+      {
+        "input": "public workspace name",
+        "column": "name",
+        "shape": "COMPANY_NAME",
+        "confidence": 1,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": "public workspace url_slug",
+        "column": "url_slug",
+        "shape": "IMAGE_URL",
+        "confidence": 0.7290821075439453,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "public",
+    "tableName": "workspace_user_type",
+    "predictions": [
+      {
+        "input": "public workspace_user_type type",
+        "column": "type",
+        "shape": "PERSON_JOB_TYPE",
+        "confidence": 0.235784575343132,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]
