@@ -218,9 +218,9 @@
           "maxLength": null
         },
         {
-          "id": "public.channel.created_by",
-          "name": "created_by",
-          "columnName": "created_by",
+          "id": "public.channel.author_id",
+          "name": "author_id",
+          "columnName": "author_id",
           "type": "uuid",
           "isRequired": true,
           "kind": "scalar",
@@ -230,6 +230,24 @@
           "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
+        },
+        {
+          "name": "users",
+          "type": "users",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "channelTousers",
+          "relationFromFields": [
+            "author_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         },
         {
           "name": "workspace",
@@ -534,9 +552,9 @@
           "maxLength": null
         },
         {
-          "id": "public.channel_thread_message.user_id",
-          "name": "user_id",
-          "columnName": "user_id",
+          "id": "public.channel_thread_message.author_id",
+          "name": "author_id",
+          "columnName": "author_id",
           "type": "uuid",
           "isRequired": true,
           "kind": "scalar",
@@ -628,7 +646,7 @@
           "kind": "object",
           "relationName": "channel_thread_messageTousers",
           "relationFromFields": [
-            "user_id"
+            "author_id"
           ],
           "relationToFields": [
             "id"
@@ -670,9 +688,9 @@
           "maxLength": null
         },
         {
-          "id": "public.user_message.user_id",
-          "name": "user_id",
-          "columnName": "user_id",
+          "id": "public.user_message.author_id",
+          "name": "author_id",
+          "columnName": "author_id",
           "type": "uuid",
           "isRequired": true,
           "kind": "scalar",
@@ -740,18 +758,22 @@
           "maxLength": null
         },
         {
-          "id": "public.user_message.workspace_id",
-          "name": "workspace_id",
-          "columnName": "workspace_id",
-          "type": "uuid",
+          "name": "users_user_message_author_idTousers",
+          "type": "users",
           "isRequired": true,
-          "kind": "scalar",
+          "kind": "object",
+          "relationName": "user_message_author_idTousers",
+          "relationFromFields": [
+            "author_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
           "isList": false,
+          "isId": false,
           "isGenerated": false,
           "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
+          "hasDefaultValue": false
         },
         {
           "name": "users_user_message_recipient_idTousers",
@@ -761,42 +783,6 @@
           "relationName": "user_message_recipient_idTousers",
           "relationFromFields": [
             "recipient_id"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "users_user_message_user_idTousers",
-          "type": "users",
-          "isRequired": true,
-          "kind": "object",
-          "relationName": "user_message_user_idTousers",
-          "relationFromFields": [
-            "user_id"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "workspace",
-          "type": "workspace",
-          "isRequired": true,
-          "kind": "object",
-          "relationName": "user_messageToworkspace",
-          "relationFromFields": [
-            "workspace_id"
           ],
           "relationToFields": [
             "id"
@@ -978,6 +964,20 @@
           "maxLength": null
         },
         {
+          "name": "channel",
+          "type": "channel",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "channelTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "channel_member",
           "type": "channel_member",
           "isRequired": false,
@@ -1006,39 +1006,25 @@
           "hasDefaultValue": false
         },
         {
+          "name": "user_message_user_message_author_idTousers",
+          "type": "user_message",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "user_message_author_idTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "user_message_user_message_recipient_idTousers",
           "type": "user_message",
           "isRequired": false,
           "kind": "object",
           "relationName": "user_message_recipient_idTousers",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "user_message_user_message_user_idTousers",
-          "type": "user_message",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "user_message_user_idTousers",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "workspace",
-          "type": "workspace",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "workspaceTousers",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,
@@ -1106,20 +1092,6 @@
           "maxLength": null
         },
         {
-          "id": "public.workspace.owner_id",
-          "name": "owner_id",
-          "columnName": "owner_id",
-          "type": "uuid",
-          "isRequired": true,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.workspace.created_at",
           "name": "created_at",
           "columnName": "created_at",
@@ -1162,43 +1134,11 @@
           "maxLength": null
         },
         {
-          "name": "users",
-          "type": "users",
-          "isRequired": true,
-          "kind": "object",
-          "relationName": "workspaceTousers",
-          "relationFromFields": [
-            "owner_id"
-          ],
-          "relationToFields": [
-            "id"
-          ],
-          "isList": false,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
           "name": "channel",
           "type": "channel",
           "isRequired": false,
           "kind": "object",
           "relationName": "channelToworkspace",
-          "relationFromFields": [],
-          "relationToFields": [],
-          "isList": true,
-          "isId": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false
-        },
-        {
-          "name": "user_message",
-          "type": "user_message",
-          "isRequired": false,
-          "kind": "object",
-          "relationName": "user_messageToworkspace",
           "relationFromFields": [],
           "relationToFields": [],
           "isList": true,

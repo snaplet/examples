@@ -14,8 +14,9 @@ model channel {
   workspace_id   String           @db.Uuid
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
   updated_at     DateTime         @default(now()) @db.Timestamptz(6)
-  created_by     String           @db.Uuid
+  author_id      String           @db.Uuid
   workspace      workspace        @relation(fields: [workspace_id], references: [id], onUpdate: Restrict, map: "channels_workspace_id_fkey")
+  users          users            @relation(fields: [author_id], references: [id], onUpdate: Restrict, map: "channel_author_id_fkey")
   channel_member channel_member[]
   channel_thread channel_thread[]
 }
@@ -41,26 +42,24 @@ model channel_thread {
 
 model channel_thread_message {
   id                String         @id @db.Uuid
-  user_id           String         @db.Uuid
+  author_id         String         @db.Uuid
   channel_thread_id String         @db.Uuid
   message           String
   created_at        DateTime       @default(now()) @db.Timestamptz(6)
   updated_at        DateTime       @default(now()) @db.Timestamptz(6)
   channel_thread    channel_thread @relation(fields: [channel_thread_id], references: [id], onUpdate: Restrict)
-  users             users          @relation(fields: [user_id], references: [id], onUpdate: Restrict)
+  users             users          @relation(fields: [author_id], references: [id], onUpdate: Restrict)
 }
 
 model user_message {
-  id                                     String    @id @db.Uuid
-  user_id                                String    @db.Uuid
-  recipient_id                           String    @db.Uuid
+  id                                     String   @id @db.Uuid
+  author_id                              String   @db.Uuid
+  recipient_id                           String   @db.Uuid
   message                                String
-  created_at                             DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at                             DateTime  @default(now()) @db.Timestamptz(6)
-  workspace_id                           String    @db.Uuid
-  users_user_message_recipient_idTousers users     @relation("user_message_recipient_idTousers", fields: [recipient_id], references: [id], onUpdate: Restrict)
-  users_user_message_user_idTousers      users     @relation("user_message_user_idTousers", fields: [user_id], references: [id], onUpdate: Restrict)
-  workspace                              workspace @relation(fields: [workspace_id], references: [id], onUpdate: Restrict)
+  created_at                             DateTime @default(now()) @db.Timestamptz(6)
+  updated_at                             DateTime @default(now()) @db.Timestamptz(6)
+  users_user_message_recipient_idTousers users    @relation("user_message_recipient_idTousers", fields: [recipient_id], references: [id], onUpdate: Restrict)
+  users_user_message_author_idTousers    users    @relation("user_message_author_idTousers", fields: [author_id], references: [id], onUpdate: Restrict)
 }
 
 model users {
@@ -78,21 +77,18 @@ model users {
   channel_member                                channel_member[]
   channel_thread_message                        channel_thread_message[]
   user_message_user_message_recipient_idTousers user_message[]           @relation("user_message_recipient_idTousers")
-  user_message_user_message_user_idTousers      user_message[]           @relation("user_message_user_idTousers")
-  workspace                                     workspace[]
+  user_message_user_message_author_idTousers    user_message[]           @relation("user_message_author_idTousers")
   workspace_member                              workspace_member[]
+  channel                                       channel[]
 }
 
 model workspace {
   id               String             @id @db.Uuid
   name             String             @unique
-  owner_id         String             @db.Uuid
   created_at       DateTime           @default(now()) @db.Timestamptz(6)
   updated_at       DateTime           @default(now()) @db.Timestamptz(6)
   url_slug         String             @unique
   channel          channel[]
-  user_message     user_message[]
-  users            users              @relation(fields: [owner_id], references: [id], onUpdate: Restrict, map: "workspace_owner_fkey")
   workspace_member workspace_member[]
 }
 

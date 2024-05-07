@@ -12,17 +12,10 @@ const main = async () => {
   // Truncate all tables in the database
   await seed.$resetDatabase();
 
+  // Create one user
   await seed.users((x) => x(1, () => ({
-    workspace_member: (x) => x(1, () => ({
-      workspace: {
-        channel: (x) => x(1, () => ({
-          channel_thread: (x) => x(1, () => ({
-            channel_thread_message: (x) => x(2, () => ({}))
-          }))
-        })),
-        user_message: (x) => x(1, () => ({}))
-      }
-    })),
+    workspace_member: (x) => x(1, ({})),
+    channel_member: (x) => x(1, ({})),
   })))
   // Type completion not working? You might want to reload your TypeScript Server to pick up the changes
 

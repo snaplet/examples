@@ -49,7 +49,7 @@
         "input": "public users bio",
         "column": "bio",
         "shape": "PERSON_BIO",
-        "confidence": 1,
+        "confidence": 0.9798080325126648,
         "context": "GENERAL",
         "confidenceContext": 0
       },
@@ -57,7 +57,7 @@
         "input": "public users display_name",
         "column": "display_name",
         "shape": "INTERNET_DISPLAY_NAME",
-        "confidence": 0.8810674548149109,
+        "confidence": 0.9956163167953491,
         "context": "GENERAL",
         "confidenceContext": 0
       },
