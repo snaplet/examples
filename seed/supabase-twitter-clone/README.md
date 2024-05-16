@@ -75,17 +75,6 @@ First, let's set up a local development environment for the Supabase Twitter clo
     npx supabase db pull
     ```
 
-This process creates a new `remote_schema.sql` file within the `supabase/migrations` folder. However, this migration lacks the necessary triggers and publications for our real-time updates to function correctly. Thus, we need to manually add them to the `remote_schema.sql` file:
-
-```sql
--- Append at the end
--- Trigger to create a profile for a user upon creation
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION "public"."create_profile_for_user"();
--- Publication for the tweets table to enable real-time functionality
-ALTER PUBLICATION "supabase_realtime" ADD TABLE "public"."tweets";
-RESET ALL;
-```
-
 Next, we must synchronize our local development project with the remote one:
 
 ```bash
