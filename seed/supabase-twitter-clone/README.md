@@ -11,6 +11,7 @@
     - [Setup OAuth for Local Development](#setup-oauth-for-local-development)
     - [Setup an Email+Password Login for Local Development](#setup-an-emailpassword-login-for-local-development)
     - [Setup @snaplet/seed](#setup-snapletseed)
+    - [Writing the Seed Script](#writing-the-seed-script)
     - [Snaplet Seed with E2E](#snaplet-seed-with-e2e)
     - [Conclusion](#conclusion)
     - [Acknowledgments](#acknowledgments)
@@ -60,7 +61,6 @@ First, let's set up a local development environment for the Supabase Twitter clo
 
     ```bash
     npx supabase login
-    npx supabase init
     ```
 
 ![supabase-init-asciinema](https://github.com/snaplet/examples/assets/8771783/10f11bca-5dd5-42ac-b81a-b33d6016026e)
@@ -71,22 +71,10 @@ First, let's set up a local development environment for the Supabase Twitter clo
     # Your projectID can be found using the `supabase projects list` command and noting the REFERENCE ID value.
     # Input your remote database password when prompted.
     npx supabase link --project-ref <your-twitter-clone-project-id>
-    # Create a valid migrations folder for Supabase to pull the first migration.
-    mkdir -p supabase/migrations
+
     # Pull the database schema from the remote project.
     npx supabase db pull
     ```
-
-This process creates a new `remote_schema.sql` file within the `supabase/migrations` folder. However, this migration lacks the necessary triggers and publications for our real-time updates to function correctly. Thus, we need to manually add them to the `remote_schema.sql` file:
-
-```sql
--- Append at the end
--- Trigger to create a profile for a user upon creation
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION "public"."create_profile_for_user"();
--- Publication for the tweets table to enable real-time functionality
-ALTER PUBLICATION "supabase_realtime" ADD TABLE "public"."tweets";
-RESET ALL;
-```
 
 Next, we must synchronize our local development project with the remote one:
 
@@ -183,44 +171,6 @@ npm run dev
 
 Although OAuth login works, it's not the most efficient method for automating testing or quickly logging into different personas, as it would require multiple GitHub accounts. Let's address this issue next.
 
-### Setup an Email+Password Login for Local Development
-
-For local development and testing, it's crucial to have the ability to log in as different personas easily. This can be achieved by creating a new user with pre-filled data. We can facilitate this by setting up an email and password login mechanism, and then utilize the Supabase admin interface to add specific data to it.
-
-Firstly, we'll create a utility route for development purposes. This route will allow us to easily log in as a user using an email and password. To accomplish this, create a new route at `app/auth/dev/login/route.ts` with the following content:
-
-```ts
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { NextResponse, type NextRequest } from "next/server";
-import { cookies } from "next/headers";
-
-export const dynamic = "force-dynamic";
-
-const inDevEnvironment = !!process && process.env.NODE_ENV === 'development';
-
-export async function GET(request: NextRequest) {
-    // This route is intended for development/testing purposes only
-    if (!inDevEnvironment) {
-        return NextResponse.redirect('/')
-    }
-    const requestUrl = new URL(request.url);
-    // Extract email and password from query parameters
-    const email = requestUrl.searchParams.get("email");
-    const password = requestUrl.searchParams.get("password");
-    if (email && password) {
-        const supabase = createRouteHandlerClient({ cookies });
-        // Sign in the user with email and password
-        await supabase.auth.signInWithPassword({ email, password });
-    }
-    return NextResponse.redirect(requestUrl.origin);
-}
-```
-
-With this setup, we can now easily log in as a user using email and password by navigating to:
-`http://localhost:3000/api/auth/dev/login?email=<user-email>&password=<user-password>`
-
-However, we still need to create a new user with email and password. This is where Snaplet Seed will be utilized.
-
 ### Setup @snaplet/seed
 
 To set it up:
@@ -285,88 +235,68 @@ const seed = await createSeedClient();
 // Reset the database, keeping the structure intact
 await seed.$resetDatabase()
 
-// Create 3 records in the HttpResponses table
-await seed.HttpResponses(x => x(3))
+// ...
 ```
 
-Now, let's edit our `seed.ts` file to generate some tweets:
+### Writing the Seed Script
+
+First we need to change `seed.ts` to create some users using the Supabase SDK.
 
 ```ts
-await seed.$resetDatabase()
+import { createSeedClient } from '@snaplet/seed';
+import { copycat } from '@snaplet/copycat';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from './lib/database.types'
 
-// Generate 10 tweets
-await seed.tweets(x => x(10))
-```
+const main = () => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation 
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-After running `npx tsx seed.ts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.ts`:
+  const PASSWORD = "testuser";
 
-```ts
-import { faker } from '@snaplet/copycat';
-
-const seed = await createSeedClient({
-  models: {
-    profiles: {
-      data: {
-        avatarUrl: ({ seed }) => faker.image.avatarGitHub(),
+  for (let i = 0; i < 5; i++) {
+    const email = copycat.email(i).toLowerCase();
+    const avatar = faker.image.avatarGitHub();
+    const fullName = copycat.fullName(i);
+    const userName = copycat.username(i);
+    
+    await supabase.auth.signUp({
+      email,
+      password: PASSWORD,
+      options: {
+        data: {
+          avatar_url: avatar,
+          name: fullName,
+          user_name: userName,
+        }
       }
-    }
+    });
   }
-});
-
-await seed.$resetDatabase()
-
-// Generate 10 tweets with valid avatar URLs
-await seed.tweets(x => x(10))
-```
-
-We can now re-run our script with `npx tsx seed.ts`.
-
-Refreshing our page should now display the seeded tweet data correctly.
-
-To easily log in as the creators of these tweets, we integrate the Supabase SDK into our seed script:
-
-```ts
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation 
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-const PASSWORD = "testuser";
-for (let i = 0; i < 5; i++) {
-  const email = copycat.email(i).toLowerCase();
-  const avatar = faker.image.avatarGitHub();
-  const fullName = copycat.fullName(i);
-  const userName = copycat.username(i);
-  
-  await supabase.auth.signUp({
-    email,
-    password: PASSWORD,
-    options: {
-      data: {
-        avatar_url: avatar,
-        name: fullName,
-        user_name: userName,
-      }
-    }
-  });
 }
 
-const { data: databaseProfiles } = await supabase.from("profiles").select();
-
-const profiles = databaseProfiles?.map(profile => ({
-  avatarUrl: profile.avatar_url,
-  id: profile.id,
-  name: profile.name,
-  username: profile.username,
-})) ?? [];
-
-// Insert tweets linked to profiles
-await seed.tweets(x => x(10), { connect: { profiles } });
-console.log("Profiles created: ", profiles);
+main()
 ```
 
-This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator.
+This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator. It will also create the corresponding rows in the `profiles` table.
+
+Now that we have this profile data, we can create some tweets using `@snaplet/seed`, and connect them up to these profiles:
+
+```ts
+// * In our app, all our data under public isn't directly linked under the auth.user table but rather under the
+// public.profiles table.
+// * For any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
+// * Since `supabase.auth.signUp()` created a user, we should now have all the profiles created as well
+const { data: databaseProfiles } = await supabase.from("profiles").select()
+
+// We convert our database fields to something that our seed client can understand
+const profiles = databaseProfiles?.map(profile => ({ id: profile.id })) ?? [];
+
+// We can now use our seed client to insert tweets that will be linked to the profiles
+await seed.tweets(x => x(10), {connect: { profiles }})
+```
 
 Combining all the steps, our `seed.ts` file becomes:
 
@@ -374,70 +304,60 @@ Combining all the steps, our `seed.ts` file becomes:
 <summary>Click to show the full code</summary>
 
 ```ts
-import { createSeedClient, type profilesScalars } from '@snaplet/seed';
-import { createClient } from '@supabase/supabase-js'
-import {Database} from './lib/database.types'
-import { copycat, faker } from '@snaplet/copycat'
+import { createSeedClient } from '@snaplet/seed';
+import { faker, copycat } from '@snaplet/copycat';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from './lib/database.types';
 
+const main = async () => {
+  const seed = await createSeedClient();
 
-const seed = await createSeedClient({
-  models: {
-    profiles: {
-      data: {
-        avatarUrl: ({ seed }) => faker.image.avatarGitHub(),
-      }
-    }
-  }
-});
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+  const PASSWORD = 'testuser';
+  for (let i = 0; i < 5; i++) {
+    const email = copycat.email(i).toLowerCase();
+    const avatar = faker.image.avatarGitHub();
+    const fullName = copycat.fullName(i);
+    const userName = copycat.username(i);
 
-
-
-// Clears all existing data in the database, but keep the structure
-await seed.$resetDatabase()
-
-const PASSWORD = "testuser";
-for (let i = 0; i < 5; i += 1) {
-  const email = copycat.email(i).toLowerCase();
-  const avatar: string = faker.image.avatarGitHub();
-  const fullName: string = copycat.fullName(i);
-  const userName: string = copycat.username(i);
-  await supabase.auth.signUp({
+    await supabase.auth.signUp({
       email,
       password: PASSWORD,
       options: {
-      data: {
-        avatar_url: avatar,
-        name: fullName,
-        user_name: userName,
-      }
-    }
-  });
-}
-// In our app, all our data under public isn't directly linked under the auth.user table but rather under the public.profiles table
-// And for any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
-// Since `supabase.auth.signUp` create a user, we should now have all the profiles created as well
-const { data: databaseProfiles } = await supabase.from("profiles").select()
-//  We convert our database fields to something that our seed client can understand
-const profiles: profilesScalars[] = databaseProfiles?.map(profile => ({
-  avatarUrl: profile.avatar_url,
-  id: profile.id,
-  name: profile.name,
-  username: profile.username,
-})) ?? []
+        data: {
+          avatar_url: avatar,
+          name: fullName,
+          user_name: userName,
+        },
+      },
+    });
+  }
 
-// We can now use our seed client to insert tweets that will be linked to the profiles
-await seed.tweets(x => x(10), {connect: { profiles }})
-console.log('Profiles created: ', profiles)
+  const { data: databaseProfiles } = await supabase.from('profiles').select();
+
+  const profiles =
+    databaseProfiles?.map((profile) => ({ id: profile.id })) ?? [];
+
+  // Insert tweets linked to profiles
+  await seed.tweets((x) => x(10), { connect: { profiles } });
+
+  // Type completion not working? You might want to reload your TypeScript Server to pick up the changes
+
+  console.log('Database seeded successfully!');
+
+  process.exit();
+};
+
+main();
 ```
-
 </details>
 
-Re-run the seed script with the environment variables set to your local Supabase instance:
+We can now run the seed script with the environment variables set to your local Supabase instance:
 
 `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx tsx seed.ts`:
 
