@@ -70,8 +70,7 @@ First, let's set up a local development environment for the Supabase Twitter clo
     # Your projectID can be found using the `supabase projects list` command and noting the REFERENCE ID value.
     # Input your remote database password when prompted.
     npx supabase link --project-ref <your-twitter-clone-project-id>
-    # Create a valid migrations folder for Supabase to pull the first migration.
-    mkdir -p supabase/migrations
+
     # Pull the database schema from the remote project.
     npx supabase db pull
     ```
