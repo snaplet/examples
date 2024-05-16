@@ -11,6 +11,7 @@
     - [Setup OAuth for Local Development](#setup-oauth-for-local-development)
     - [Setup an Email+Password Login for Local Development](#setup-an-emailpassword-login-for-local-development)
     - [Setup @snaplet/seed](#setup-snapletseed)
+    - [Writing the Seed Script](#writing-the-seed-script)
     - [Snaplet Seed with E2E](#snaplet-seed-with-e2e)
     - [Conclusion](#conclusion)
     - [Acknowledgments](#acknowledgments)
@@ -181,7 +182,7 @@ npx @snaplet/seed@latest init
 You will be asked to choose an "adapter" to connect to your local database,
 in this example we'll use "postgres-js".
 
-The cli will generate a default `seed.config.ts` for you and prompt you at some point
+The cli will genrate a default `seed.config.ts` for you and prompt you at some point
 to edit it to provide an "adapter" allowing us to connect to the database.
 
 What we need to do here is two things:
@@ -205,7 +206,7 @@ export default defineConfig({
   alias: {
     // We want inflections name on our fields see: https://docs.snaplet.dev/seed/core-concepts#inflection
     inflection: true,
-  },
+  }
   select: [
     // We don't alter any extensions tables that might be owned by extensions
     "!*", 
@@ -234,47 +235,18 @@ const seed = await createSeedClient();
 // Reset the database, keeping the structure intact
 await seed.$resetDatabase()
 
-// Create 3 records in the HttpResponses table
-await seed.HttpResponses(x => x(3))
+// ...
 ```
 
-Now, let's edit our `seed.ts` file to generate some tweets:
+### Writing the Seed Script
+
+First we need to change `seed.ts` to create some users using the Supabase SDK.
 
 ```ts
-await seed.$resetDatabase()
+import { createSeedClient } from '@snaplet/seed';
+import { copycat } from '@snaplet/copycat';
+import { createClient } from '@supabase/supabase-js';
 
-// Generate 10 tweets
-await seed.tweets(x => x(10))
-```
-
-After running `npx tsx seed.ts`, we encounter an error related to invalid `avatar_url` in the Next.js images. To fix this, we adjust the `avatar_url` generation in our `seed.ts`:
-
-```ts
-import { faker } from '@snaplet/copycat';
-
-const seed = await createSeedClient({
-  models: {
-    profiles: {
-      data: {
-        avatarUrl: ({ seed }) => faker.image.avatarGitHub(),
-      }
-    }
-  }
-});
-
-await seed.$resetDatabase()
-
-// Generate 10 tweets with valid avatar URLs
-await seed.tweets(x => x(10))
-```
-
-We can now re-run our script with `npx tsx seed.ts`.
-
-Refreshing our page should now display the seeded tweet data correctly.
-
-To easily log in as the creators of these tweets, we integrate the Supabase SDK into our seed script:
-
-```ts
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation 
@@ -282,6 +254,7 @@ const supabase = createClient(
 );
 
 const PASSWORD = "testuser";
+
 for (let i = 0; i < 5; i++) {
   const email = copycat.email(i).toLowerCase();
   const avatar = faker.image.avatarGitHub();
@@ -300,22 +273,25 @@ for (let i = 0; i < 5; i++) {
     }
   });
 }
-
-const { data: databaseProfiles } = await supabase.from("profiles").select();
-
-const profiles = databaseProfiles?.map(profile => ({
-  avatarUrl: profile.avatar_url,
-  id: profile.id,
-  name: profile.name,
-  username: profile.username,
-})) ?? [];
-
-// Insert tweets linked to profiles
-await seed.tweets(x => x(10), { connect: { profiles } });
-console.log("Profiles created: ", profiles);
 ```
 
-This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator.
+This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator. It will also create the corresponding rows in the `profiles` table.
+
+Now that we have this profile data, we can create some tweets using `@snaplet/seed`, and connect them up to these profiles:
+
+```ts
+// * In our app, all our data under public isn't directly linked under the auth.user table but rather under the
+// public.profiles table.
+// * For any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
+// * Since `supabase.auth.signUp()` created a user, we should now have all the profiles created as well
+const { data: databaseProfiles } = await supabase.from("profiles").select()
+
+// We convert our database fields to something that our seed client can understand
+const profiles = databaseProfiles?.map(profile => ({ id: profile.id })) ?? [];
+
+// We can now use our seed client to insert tweets that will be linked to the profiles
+await seed.tweets(x => x(10), {connect: { profiles }})
+```
 
 Combining all the steps, our `seed.ts` file becomes:
 
@@ -323,9 +299,9 @@ Combining all the steps, our `seed.ts` file becomes:
 <summary>Click to show the full code</summary>
 
 ```ts
-import { createSeedClient, type profilesScalars } from '@snaplet/seed';
+import { createSeedClient } from '@snaplet/seed';
 import { createClient } from '@supabase/supabase-js'
-import {Database} from './lib/database.types'
+import { Database } from './lib/database.types'
 import { copycat, faker } from '@snaplet/copycat'
 
 
@@ -343,8 +319,6 @@ const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
-
-
 
 // Clears all existing data in the database, but keep the structure
 await seed.$resetDatabase()
@@ -367,26 +341,22 @@ for (let i = 0; i < 5; i += 1) {
     }
   });
 }
-// In our app, all our data under public isn't directly linked under the auth.user table but rather under the public.profiles table
-// And for any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
-// Since `supabase.auth.signUp` create a user, we should now have all the profiles created as well
+
+// * In our app, all our data under public isn't directly linked under the auth.user table but rather under the
+// public.profiles table.
+// * For any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
+// * Since `supabase.auth.signUp()` created a user, we should now have all the profiles created as well
 const { data: databaseProfiles } = await supabase.from("profiles").select()
-//  We convert our database fields to something that our seed client can understand
-const profiles: profilesScalars[] = databaseProfiles?.map(profile => ({
-  avatarUrl: profile.avatar_url,
-  id: profile.id,
-  name: profile.name,
-  username: profile.username,
-})) ?? []
+
+// We convert our database fields to something that our seed client can understand
+const profiles = databaseProfiles?.map(profile => ({ id: profile.id })) ?? [];
 
 // We can now use our seed client to insert tweets that will be linked to the profiles
 await seed.tweets(x => x(10), {connect: { profiles }})
-console.log('Profiles created: ', profiles)
 ```
-
 </details>
 
-Re-run the seed script with the environment variables set to your local Supabase instance:
+We can now run the seed script with the environment variables set to your local Supabase instance:
 
 `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key> npx tsx seed.ts`:
 
