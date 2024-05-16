@@ -181,7 +181,7 @@ npx @snaplet/seed@latest init
 You will be asked to choose an "adapter" to connect to your local database,
 in this example we'll use "postgres-js".
 
-The cli will genrate a default `seed.config.ts` for you and prompt you at some point
+The cli will generate a default `seed.config.ts` for you and prompt you at some point
 to edit it to provide an "adapter" allowing us to connect to the database.
 
 What we need to do here is two things:
