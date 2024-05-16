@@ -170,44 +170,6 @@ npm run dev
 
 Although OAuth login works, it's not the most efficient method for automating testing or quickly logging into different personas, as it would require multiple GitHub accounts. Let's address this issue next.
 
-### Setup an Email+Password Login for Local Development
-
-For local development and testing, it's crucial to have the ability to log in as different personas easily. This can be achieved by creating a new user with pre-filled data. We can facilitate this by setting up an email and password login mechanism, and then utilize the Supabase admin interface to add specific data to it.
-
-Firstly, we'll create a utility route for development purposes. This route will allow us to easily log in as a user using an email and password. To accomplish this, create a new route at `app/auth/dev/login/route.ts` with the following content:
-
-```ts
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { NextResponse, type NextRequest } from "next/server";
-import { cookies } from "next/headers";
-
-export const dynamic = "force-dynamic";
-
-const inDevEnvironment = !!process && process.env.NODE_ENV === 'development';
-
-export async function GET(request: NextRequest) {
-    // This route is intended for development/testing purposes only
-    if (!inDevEnvironment) {
-        return NextResponse.redirect('/')
-    }
-    const requestUrl = new URL(request.url);
-    // Extract email and password from query parameters
-    const email = requestUrl.searchParams.get("email");
-    const password = requestUrl.searchParams.get("password");
-    if (email && password) {
-        const supabase = createRouteHandlerClient({ cookies });
-        // Sign in the user with email and password
-        await supabase.auth.signInWithPassword({ email, password });
-    }
-    return NextResponse.redirect(requestUrl.origin);
-}
-```
-
-With this setup, we can now easily log in as a user using email and password by navigating to:
-`http://localhost:3000/api/auth/dev/login?email=<user-email>&password=<user-password>`
-
-However, we still need to create a new user with email and password. This is where Snaplet Seed will be utilized.
-
 ### Setup @snaplet/seed
 
 To set it up:
