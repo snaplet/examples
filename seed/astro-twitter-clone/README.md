@@ -6,7 +6,7 @@
 
 Take this schema:
 
-```json
+```ts
 const Post = defineTable({
   columns: {
     content: column.text(),
