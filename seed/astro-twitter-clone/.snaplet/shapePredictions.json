@@ -1,0 +1,46 @@
+[
+  {
+    "schemaName": "",
+    "tableName": "Post",
+    "predictions": [
+      {
+        "input": " post content",
+        "column": "content",
+        "shape": "POST_BODY",
+        "confidence": 0.9012767672538757,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  },
+  {
+    "schemaName": "",
+    "tableName": "User",
+    "predictions": [
+      {
+        "input": " user name",
+        "column": "name",
+        "shape": "USERNAME",
+        "confidence": 0.981331467628479,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": " user profile_image_key",
+        "column": "profileImageKey",
+        "shape": "INTERNET_AVATAR",
+        "confidence": 0.9693268537521362,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      },
+      {
+        "input": " user username",
+        "column": "username",
+        "shape": "USERNAME",
+        "confidence": 0.9948732256889343,
+        "context": "GENERAL",
+        "confidenceContext": 0
+      }
+    ]
+  }
+]

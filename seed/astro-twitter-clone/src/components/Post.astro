@@ -1,0 +1,30 @@
+---
+import VerifiedIcon from "./icons/verified.astro"
+
+interface Props {
+    name: string
+    username: string
+    time: string
+    content: string
+    profileImageKey: string
+    isVerified: boolean
+}
+
+const { name, username, time, content, profileImageKey, isVerified } = Astro.props
+---
+
+<div class="flex gap-2 text-[#E7E9EA] p-4 border-zinc-500 border-b last:border-b-0 flex-grow-0">
+    <img src={`/profile/${profileImageKey}`} alt={`${username}'s avatar`} class="w-10 h-10 bg-zinc-500 rounded-full gap-2 overflow-hidden object-cover">
+    <div>
+        <div class="flex gap-1 text-zinc-400 items-center truncate">
+            <b class="text-white">{name}</b>
+            {isVerified ? <VerifiedIcon /> : null}
+            <div>@{username}</div>
+            <div>·</div>
+            <div>{time}</div>
+        </div>
+        <div>
+            {content}
+        </div>
+    </div>
+</div>
