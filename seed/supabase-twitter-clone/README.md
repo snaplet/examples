@@ -205,7 +205,7 @@ export default defineConfig({
   alias: {
     // We want inflections name on our fields see: https://docs.snaplet.dev/seed/core-concepts#inflection
     inflection: true,
-  }
+  },
   select: [
     // We don't alter any extensions tables that might be owned by extensions
     "!*", 
