@@ -246,33 +246,38 @@ First we need to change `seed.ts` to create some users using the Supabase SDK.
 import { createSeedClient } from '@snaplet/seed';
 import { copycat } from '@snaplet/copycat';
 import { createClient } from '@supabase/supabase-js';
+import { Database } from './lib/database.types'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation 
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const main = () => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation 
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-const PASSWORD = "testuser";
+  const PASSWORD = "testuser";
 
-for (let i = 0; i < 5; i++) {
-  const email = copycat.email(i).toLowerCase();
-  const avatar = faker.image.avatarGitHub();
-  const fullName = copycat.fullName(i);
-  const userName = copycat.username(i);
-  
-  await supabase.auth.signUp({
-    email,
-    password: PASSWORD,
-    options: {
-      data: {
-        avatar_url: avatar,
-        name: fullName,
-        user_name: userName,
+  for (let i = 0; i < 5; i++) {
+    const email = copycat.email(i).toLowerCase();
+    const avatar = faker.image.avatarGitHub();
+    const fullName = copycat.fullName(i);
+    const userName = copycat.username(i);
+    
+    await supabase.auth.signUp({
+      email,
+      password: PASSWORD,
+      options: {
+        data: {
+          avatar_url: avatar,
+          name: fullName,
+          user_name: userName,
+        }
       }
-    }
-  });
+    });
+  }
 }
+
+main()
 ```
 
 This process creates a pool of 5 users with email and password logins, allowing us to easily log in as any tweet creator. It will also create the corresponding rows in the `profiles` table.
@@ -300,59 +305,55 @@ Combining all the steps, our `seed.ts` file becomes:
 
 ```ts
 import { createSeedClient } from '@snaplet/seed';
-import { createClient } from '@supabase/supabase-js'
-import { Database } from './lib/database.types'
-import { copycat, faker } from '@snaplet/copycat'
+import { faker, copycat } from '@snaplet/copycat';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from './lib/database.types';
 
+const main = async () => {
+  const seed = await createSeedClient();
 
-const seed = await createSeedClient({
-  models: {
-    profiles: {
-      data: {
-        avatarUrl: ({ seed }) => faker.image.avatarGitHub(),
-      }
-    }
-  }
-});
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    // Note you might want to use `SUPABASE_ROLE` key here with `auth.admin.signUp` if your app is using email confirmation
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+  const PASSWORD = 'testuser';
+  for (let i = 0; i < 5; i++) {
+    const email = copycat.email(i).toLowerCase();
+    const avatar = faker.image.avatarGitHub();
+    const fullName = copycat.fullName(i);
+    const userName = copycat.username(i);
 
-// Clears all existing data in the database, but keep the structure
-await seed.$resetDatabase()
-
-const PASSWORD = "testuser";
-for (let i = 0; i < 5; i += 1) {
-  const email = copycat.email(i).toLowerCase();
-  const avatar: string = faker.image.avatarGitHub();
-  const fullName: string = copycat.fullName(i);
-  const userName: string = copycat.username(i);
-  await supabase.auth.signUp({
+    await supabase.auth.signUp({
       email,
       password: PASSWORD,
       options: {
-      data: {
-        avatar_url: avatar,
-        name: fullName,
-        user_name: userName,
-      }
-    }
-  });
-}
+        data: {
+          avatar_url: avatar,
+          name: fullName,
+          user_name: userName,
+        },
+      },
+    });
+  }
 
-// * In our app, all our data under public isn't directly linked under the auth.user table but rather under the
-// public.profiles table.
-// * For any user inserted in the auth.users table we have a trigger that will insert a row in the public.profiles table
-// * Since `supabase.auth.signUp()` created a user, we should now have all the profiles created as well
-const { data: databaseProfiles } = await supabase.from("profiles").select()
+  const { data: databaseProfiles } = await supabase.from('profiles').select();
 
-// We convert our database fields to something that our seed client can understand
-const profiles = databaseProfiles?.map(profile => ({ id: profile.id })) ?? [];
+  const profiles =
+    databaseProfiles?.map((profile) => ({ id: profile.id })) ?? [];
 
-// We can now use our seed client to insert tweets that will be linked to the profiles
-await seed.tweets(x => x(10), {connect: { profiles }})
+  // Insert tweets linked to profiles
+  await seed.tweets((x) => x(10), { connect: { profiles } });
+
+  // Type completion not working? You might want to reload your TypeScript Server to pick up the changes
+
+  console.log('Database seeded successfully!');
+
+  process.exit();
+};
+
+main();
 ```
 </details>
 
