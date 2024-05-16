@@ -60,7 +60,6 @@ First, let's set up a local development environment for the Supabase Twitter clo
 
     ```bash
     npx supabase login
-    npx supabase init
     ```
 
 ![supabase-init-asciinema](https://github.com/snaplet/examples/assets/8771783/10f11bca-5dd5-42ac-b81a-b33d6016026e)
