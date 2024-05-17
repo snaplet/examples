@@ -1,8 +1,10 @@
+# Astro Twitter Clone
+
 ## Summary
 
 ### What’s This all about
 
-**Astro now offers a hosted database solution with Astro DB (version 4.5 onwards).** This provides a convenient way to manage data for content-driven websites built with Astro. Locally, Astro DB utilizes an SQLite database along with a `seed.ts` file for populating initial data. While the integration of a local SQLite database is great, seeding data still requires writing individual statements using your ORM within the seed script.
+**Astro now offers a hosted database solution with Astro DB (version 4.5 onwards).** This provides a convenient way to manage data for content-driven websites built with Astro. Locally, Astro DB utilizes an SQLite database along with a `seed.ts` file for populating initial data. While the integration of a local SQLite database is great, seeding data still requires writing individual statements using the DB ORM within the seed script.
 
 Take this schema:
 
@@ -71,7 +73,7 @@ export default async function seed() {
 }
 ```
 
-In this tutorial we will be adding seed to a twitter clone, two populate it with data, that also includes profile images.
+In this tutorial we will being adding seed to a twitter clone, to populate it with data, and use a 3rd party storage service to store the profile images.
 
 ### Prerequisites
 
@@ -81,17 +83,19 @@ In this tutorial we will be adding seed to a twitter clone, two populate it with
 
 1. `git clone git@github.com:snaplet/examples.git && cd examples/seed/astro-twitter-clone`
 2. `npm install`
-3. Run the app with `npm run dev` to create your `.astro` folder
+3. Run the app with `npm run dev` to create a `.astro` folder
 
-You notice a few things:
+You notice the following:
 
-`seed.config.ts` file - this is the file, `seed` will use to interface with your database. You can see that the `seed` **better-sqlite3** adapter is in use and we have defined `.astro/content` \*\*\*\*as the database path.
+`seed.config.ts` file - this file is used to interface with your database. You can see that the `seed` **better-sqlite3** adapter is in use and we have defined `.astro/content` as the database path.
 
-`seed.ts` file at root of the project - we define our logic here, and use `execa` in the `db/seed.ts` file to execute the `seed.ts` at the root of the project. This is because at the time of writing (16 May), astro is unable to bundle seed, which contains generated assets. So we use this as a workaround.
+`seed.ts` file - at the root of the project, this is where we define our seed logic. We will be using the `@snaplet/seed` package to seed our database. At the time of writing (17 May), astro is unable to bundle seed's generated assets, so we use `execa` in the `db/seed.ts` file to execute the `seed.ts` at the root of the project.
 
-### Our first seed
+> `seed.ts` is renamed to `root-seed.ts`
 
-In our `seed.ts` at the root of our project we have simple script.
+### A basic seed script
+
+Start with the following seed script
 
 ```tsx
 /**
@@ -113,17 +117,23 @@ const main = async () => {
 };
 ```
 
-> The reason `resetDatabase` function is not used, is because astro resets your database, before it runs the seed script.
+> The reason [`resetDatabase`](https://docs.snaplet.dev/seed/reference/client#resetdatabase) function is not in use, is because Astro resets your database before running the seed script.
 
-If run `npm run dev` astro will run the seed script and if we visit our [`http://localhost:4321/`](http://localhost:4321/) we should see the following:
+If we run `npm run dev` the database will be populated with the seeded data. If you visit `http://localhost:4321/` you should see the following:
 
-![Screenshot 2024-05-16 at 15.01.48.png](/seed/astro-twitter-clone/imgs/example-1.png)
+![Simple example of the clone](/seed/astro-twitter-clone/imgs/example-1.png)
 
-Great! your app now us 10 users that you can now work with. However what if we wanted to add sorting functionality to the application, sorting by verified and date. At the moment all the users are marked as unverified (corresponding to the default value set in the schema definition) and all the dates are the same.
+Great! the app has 10 posts. If you wanted to add sorting functionality to the application (sorting by verification and date). You would update the `pages/index.astro` page where the tweets are displayed.
 
-Update your `Post` creation, to seed the `isVerified` and `createdAt` columns, it should look this:
+```astro
+// pages/index.astro
+<query>.orderBy(asc(PostEntity.createdAt))
+```
+
+The dates are the same and none of the users are verified. Reflecting the defaults that are set in the schema. Update the `Post` creation to seed the `isVerified` and `createdAt` columns.
 
 ```tsx
+// root-seed.ts
 await seed.Post((x) =>
   x(10, {
     User: {
@@ -136,19 +146,15 @@ await seed.Post((x) =>
 );
 ```
 
-If we restart our dev server again we should get the following:
-
-![Screenshot 2024-05-16 at 15.10.03.png](/seed/astro-twitter-clone/imgs/example-2.png)
-
-We know have randomized dates and a few verified users. When we add our sorting functionality, for now you can just sort by the date the post was created. You have this now:
+If you restart the dev server, you now have randomized dates, and a few verified users, sort by the date the post was created.
 
 ![Screenshot 2024-05-16 at 15.12.35.png](/seed/astro-twitter-clone/imgs/example-3.png)
 
-In many scenerio’s we can say that seed has done it’s, but applications grow and so does the functionality of the them. Let’s say you were tasked with adding profile images. At the end of the day, seed is run in a typescript file, like a typical seed script, we can introduce 3rd party services or query existing data to enrich the final result.
+In many scenerio's this is enough, but as the application grows so does the functionality of the application. If you were tasked with adding profile images, you would need to update the seed script to include the profile images.
 
-### Hooking up Cloudflare R2
+### Adding Cloudflare R2 to the Astro project
 
-You’ve decided to go for Cloudflare R2, Cloudflare’s object storage service to store the user profiles. Astro has a `@astrojs/cloudflare` plugin, that allows you to integrate cloudflare services right into your application.
+You decided to use Cloudflare R2 to store the profile images. Astro has a `@astrojs/cloudflare` plugin that allows you to integrate cloudflare services right into your application.
 
 1. **Add the Cloudflare plugin to your Astro project**
 
@@ -156,15 +162,15 @@ You’ve decided to go for Cloudflare R2, Cloudflare’s object storage service 
 npx astro add cloudflare
 ```
 
-This will install the `@astrojs/cloudflare` dependency and update your `astro.config.mjs`
+This will install the `@astrojs/cloudflare` dependency and update your `astro.config.mjs` file.
 
 1. **Add R2, with a platform proxy settings**
 
 ```jsx
 /** @type {import("@astrojs/cloudflare").Options["platformProxy"]} */
 export const platformProxyOptions = {
-  // defaults inside `@astrojs/cloudflare`
-  // to be used in `seed.ts`
+  // internal defaults for `@astrojs/cloudflare`
+  // we will use these settings in the `seed.ts` file.
   enabled: true,
   configPath: "wrangler.toml",
   experimentalJsonConfig: false,
@@ -183,7 +189,7 @@ export default defineConfig({
 });
 ```
 
-1. Add a `wrangler.toml` file
+2. Add a `wrangler.toml` file
 
 ```toml
 [[r2_buckets]]
@@ -193,15 +199,53 @@ bucket_name = "webpages"
 
 To add types and learn how to access the bindings you can follow the documentation [here](https://docs.astro.build/en/guides/integrations-guide/cloudflare/#cloudflare-runtime)
 
+### Loading images from R2
+
+You've now added R2 to the application. There are two places updated:
+
+1. `src/pages/profile/[key].ts` - this an API route that fetches the image from R2 and returns it as a response:
+
+```ts
+// src/pages/profile/[key].ts
+import type { APIRoute } from "astro";
+
+export const prerender = false;
+
+export const GET: APIRoute = async (ctx) => {
+  const { key } = ctx.params;
+  if (!key) return new Response(null, { status: 400 });
+
+  const profileImageObj = await ctx.locals.runtime.env.R2.get(key);
+
+  if (profileImageObj === null) {
+    return new Response(`${key} not found`, { status: 404 });
+  }
+
+  return new Response(profileImageObj.body);
+};
+```
+
+2. `src/components/Post.astro` - this is where the profile image is loaded, using the key
+
+```astro
+<img src={`/profile/${profileImageKey}`} ... />
+```
+
+Now if you visit `http://localhost:4321/` you should see the following:
+
+![Tweets with broken profile images](/seed/astro-twitter-clone/imgs/example-5.png)
+
+You have tweets and profiles, but the images don't load. This is because we haven't updated the seed script to include the profile images.
+
 ### Using Seed with R2
 
-We will update our seed file, to fetch images using `fakers` image url function:
+Update the `root-seed.ts` file to get image urls using [**faker**](https://fakerjs.dev/api/image#url) image module:
 
 ```tsx
 const url = faker.image.url();
 ```
 
-Download them using the `fetch` function and store them in our local R2 instance as an `ArrayBuffer`
+Download the image using the `fetch` function and store the result (`ArrayBuffer`) in our local R2 instance.
 
 ```tsx
 const downloadAndStoreImage = async (
@@ -280,7 +324,7 @@ const main = async () => {
 main();
 ```
 
-If we update our app, by adding an endpoint that fetches the images (`src/pages/profile/[key].ts` ) and load them in our Post component `src/component/Post.astro` . We should now have a page with profile images.
+If you restart your dev server you should see the following if you visit your app:
 
 ![Screenshot 2024-05-16 at 15.40.01.png](/seed/astro-twitter-clone/imgs/example-4.png)
 

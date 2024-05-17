@@ -43,7 +43,7 @@ const main = async () => {
 
           return key;
         },
-        isVerified: async ({ seed }) => {
+        isVerified: ({ seed }) => {
           return copycat.int(seed, { min: 0, max: 1 });
         },
       },
