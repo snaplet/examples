@@ -1,0 +1,31 @@
+{
+  "name": "astro-seed-example",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "wrangler types && astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.7.0",
+    "@astrojs/cloudflare": "^10.2.6",
+    "@astrojs/db": "^0.11.2",
+    "@astrojs/tailwind": "^5.1.0",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "astro": "^4.8.4",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.56.0",
+    "date-fns": "3.6.0"
+  },
+  "devDependencies": {
+    "@snaplet/copycat": "^5.0.0",
+    "@snaplet/seed": "^0.97.15",
+    "@types/better-sqlite3": "^7.6.10",
+    "better-sqlite3": "^10.0.0",
+    "execa": "9.1.0"
+  }
+}

@@ -1,0 +1,29 @@
+---
+import { db, Post as PostEntity, User, eq, asc } from "astro:db"
+
+import { format } from "date-fns"
+
+import Layout from "../layout.astro"
+import Post from "../components/Post.astro"
+
+const posts = await db.select({
+	username: User.username,
+	name: User.name,
+	content: PostEntity.content,
+	profileImageKey: User.profileImageKey,
+	isVerified: User.isVerified,
+	createdAt: PostEntity.createdAt
+}).from(PostEntity).innerJoin(User, eq(PostEntity.createdByUsername, User.username)).orderBy(asc(PostEntity.createdAt))
+---
+
+<Layout>
+	<div class="max-w-xl mx-auto min-h-screen border-x border-zinc-500">
+		{
+			posts.map((p) => (
+				<Post {...p} time={format(p.createdAt, "MMM dd")} />
+			))
+		}
+		{posts.length === 0 ? <div class="text-center p-8">No posts found</div> : null}
+	</div>
+</Layout>
+

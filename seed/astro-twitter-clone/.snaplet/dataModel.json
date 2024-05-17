@@ -1,0 +1,172 @@
+{
+  "models": {
+    "Post": {
+      "id": "Post",
+      "tableName": "Post",
+      "fields": [
+        {
+          "id": "Post._id",
+          "name": "_id",
+          "columnName": "_id",
+          "type": "integer",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "Post__id_seq",
+            "increment": 1
+          },
+          "hasDefaultValue": false,
+          "isId": true
+        },
+        {
+          "id": "Post.content",
+          "name": "content",
+          "columnName": "content",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false
+        },
+        {
+          "id": "Post.createdAt",
+          "name": "createdAt",
+          "columnName": "createdAt",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false
+        },
+        {
+          "id": "Post.createdByUsername",
+          "name": "createdByUsername",
+          "columnName": "createdByUsername",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false
+        },
+        {
+          "name": "User",
+          "type": "User",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "PostToUser",
+          "relationFromFields": [
+            "createdByUsername"
+          ],
+          "relationToFields": [
+            "username"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "Post_pkey",
+          "fields": [
+            "_id"
+          ]
+        }
+      ]
+    },
+    "User": {
+      "id": "User",
+      "tableName": "User",
+      "fields": [
+        {
+          "id": "User.username",
+          "name": "username",
+          "columnName": "username",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true
+        },
+        {
+          "id": "User.name",
+          "name": "name",
+          "columnName": "name",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false
+        },
+        {
+          "id": "User.profileImageKey",
+          "name": "profileImageKey",
+          "columnName": "profileImageKey",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false
+        },
+        {
+          "id": "User.isVerified",
+          "name": "isVerified",
+          "columnName": "isVerified",
+          "type": "integer",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false
+        },
+        {
+          "name": "Post",
+          "type": "Post",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "PostToUser",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "User_pkey",
+          "fields": [
+            "username"
+          ]
+        }
+      ]
+    }
+  },
+  "enums": {}
+}
